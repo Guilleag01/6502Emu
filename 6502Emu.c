@@ -1,12 +1,24 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <unistd.h>
 
-void executeInstruction(char instruction);
+#define TEST printf("TEST\n")
+
+void allocateMemory(char ** memory, int size);
+void executeInstruction(void (* instructionSet[])(), unsigned char instruction  );
 void haltCPU();
+void cycle(unsigned int cycle);
+void initializeInstructionSet(void (* instructionSet[])());
+void loadFileToMemory(char * fileName, char * memory);
+void run();
+char readFromMemory();
+void printStatus();
 
 // Memoria
 char * memory;
 int cpuClock = 0;
-float frecuency = 1;
+int frecuency = 10;
 
 // Registros
 short PC = 0;
@@ -26,13 +38,95 @@ C	Carry
 */
 char SP = 0;
 
+void (* instructionSet[256])();
+
+bool stopSignal = false;
+
 int main(){
-    printf("%ld", sizeof(short));
+    initializeInstructionSet(instructionSet);
+    allocateMemory(&memory, 64000);
+    loadFileToMemory("programFile.bin", memory);
+    run();
+    printStatus();
 }
 
-void executeInstruction(char instruction){
-    switch (instruction){
+void run(){
+    while(!stopSignal){
+        unsigned char instruction = (unsigned char)readFromMemory();
+        executeInstruction(instructionSet, instruction);
+    }
+}
+
+void loadFileToMemory(char * fileName, char * memory){
+    FILE * file;
+    file = fopen(fileName, "r");
+    if(file != NULL){
+        int pos = 0;
+        char c;
+        while((c = fgetc(file)) != EOF){
+            memory[pos] = (char) c;
+        }
+    }else{
+        printf("ERROR\n");
+    }
+    fclose(file);
+}
+
+void initializeInstructionSet(void (* instructionSet[])()){
+    instructionSet[0x00] = haltCPU;
+}
+
+void allocateMemory(char ** memory, int size){
+    *memory = (char *)malloc(size);
+}
+
+char readFromMemory(){
+    return memory[PC++];
+}
+
+void cycle(unsigned int cycle){
+    cpuClock += cycle;
+    sleep((int)(cycle/frecuency));
+}
+
+void printStatus(){
+    printf("\n======== GENERAL STATUS ========\n");
+    printf("Clock: %d Frecuency: %d\n", cpuClock, frecuency);
+    printf("=========== REGISTERS ==========\n");
+    printf("PC: %d Acc: %x X: %x\nY: %x SR: %x SP: %x\n\n", PC, accumulator, X, Y, SR, SP);
+}
+
+void executeInstruction(void (* instructionSet[])(), unsigned char instruction){
+    instructionSet[instruction]();
+}
+
+void haltCPU(){
+    printf("System halted\n");
+    cycle(7);
+    stopSignal = true;
+}
+
+
+
+
+
+
+    // int ins2 = 0;
+    // unsigned char instruction = 0;
+    // while(true){
+    //     printf("> ");
+    //     char ins[2];
+    //     scanf("%s", ins);
+    //     ins2 = (int)strtol(ins, NULL, 16);
+    //     instruction = (unsigned char)ins2;
+    //     executeInstruction(instructionSet, instruction);
+    // }
+
+
+/*
+switch (instruction){
     case 0x00:
+        cycle(7);
         haltCPU();
         break;
     case 0x01:
@@ -353,8 +447,5 @@ void executeInstruction(char instruction){
     default:
         break;
     }
-}
 
-void haltCPU(){
-    
-}
+*/
