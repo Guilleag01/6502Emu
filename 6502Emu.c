@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <time.h>
 
 #define TEST printf("TEST\n")
 
@@ -14,18 +15,22 @@ void loadFileToMemory(char * fileName, char * memory);
 void run();
 char readFromMemory();
 void printStatus();
+void loadAcumulatorWithMemory();
+void storeAccumulatorInMemory();
+char addWithCarry(char a, char b);
 
 // Memoria
 char * memory;
 int cpuClock = 0;
-int frecuency = 10;
+float frecuency = 1000000; //1 MHz
 
 // Registros
 short PC = 0;
 char accumulator = 0;
 char X = 0;
 char Y = 0;
-char SR = 0;
+//             Neg  Overflow  -    Break Decimal  Int   Zero   Carry
+bool SR[8] = {false, false, false, false, false, false, false, false};
 /*
 N	Negative
 V	Overflow
@@ -42,12 +47,15 @@ void (* instructionSet[256])();
 
 bool stopSignal = false;
 
+bool useFrecuency = true;
+
 int main(){
     initializeInstructionSet(instructionSet);
-    allocateMemory(&memory, 64000);
+    allocateMemory(&memory, 65535);
     loadFileToMemory("programFile.bin", memory);
     run();
     printStatus();
+    //printf("%x\n", memory[1024]);
 }
 
 void run(){
@@ -64,16 +72,12 @@ void loadFileToMemory(char * fileName, char * memory){
         int pos = 0;
         char c;
         while((c = fgetc(file)) != EOF){
-            memory[pos] = (char) c;
+            memory[pos++] = (char) c;
         }
     }else{
         printf("ERROR\n");
     }
     fclose(file);
-}
-
-void initializeInstructionSet(void (* instructionSet[])()){
-    instructionSet[0x00] = haltCPU;
 }
 
 void allocateMemory(char ** memory, int size){
@@ -86,14 +90,50 @@ char readFromMemory(){
 
 void cycle(unsigned int cycle){
     cpuClock += cycle;
-    sleep((int)(cycle/frecuency));
+    if(useFrecuency){
+        sleep(cycle/frecuency);
+    }
 }
 
 void printStatus(){
     printf("\n======== GENERAL STATUS ========\n");
-    printf("Clock: %d Frecuency: %d\n", cpuClock, frecuency);
+    printf("Clock: %d Frecuency: %f\n", cpuClock, frecuency);
     printf("=========== REGISTERS ==========\n");
-    printf("PC: %d Acc: %x X: %x\nY: %x SR: %x SP: %x\n\n", PC, accumulator, X, Y, SR, SP);
+    printf("PC: %d Acc: %x X: %x Y: %x SP: %x\n", PC, accumulator, X, Y, SP);
+    printf("Flags: N: %d V: %d B: %d D: %d I: %d Z: %d C: %d\n\n", SR[0], SR[1], SR[3], SR[4], SR[5], SR[6], SR[7]);
+}
+
+char addWithCarry(char a, char b){
+    bool c = SR[7];
+    if(a + b + c > 127){
+        SR[7] = true;
+    }
+    return a + b + c;
+}
+
+void initializeInstructionSet(void (* instructionSet[])()){
+
+    // BRK
+    instructionSet[0x00] = haltCPU;
+
+    //LDA
+    instructionSet[0xA9] = loadAcumulatorWithMemory;
+    instructionSet[0xA5] = loadAcumulatorWithMemory;
+    instructionSet[0xB5] = loadAcumulatorWithMemory;
+    instructionSet[0xAD] = loadAcumulatorWithMemory;
+    instructionSet[0xBD] = loadAcumulatorWithMemory;
+    instructionSet[0xB9] = loadAcumulatorWithMemory;
+    instructionSet[0xA1] = loadAcumulatorWithMemory;
+    instructionSet[0xB1] = loadAcumulatorWithMemory;
+
+    //STA
+    instructionSet[0x85] = storeAccumulatorInMemory;
+    instructionSet[0x95] = storeAccumulatorInMemory;
+    instructionSet[0x8D] = storeAccumulatorInMemory;
+    instructionSet[0x9D] = storeAccumulatorInMemory;
+    instructionSet[0x99] = storeAccumulatorInMemory;
+    instructionSet[0x81] = storeAccumulatorInMemory;
+    instructionSet[0x91] = storeAccumulatorInMemory;
 }
 
 void executeInstruction(void (* instructionSet[])(), unsigned char instruction){
@@ -106,346 +146,102 @@ void haltCPU(){
     stopSignal = true;
 }
 
-
-
-
-
-
-    // int ins2 = 0;
-    // unsigned char instruction = 0;
-    // while(true){
-    //     printf("> ");
-    //     char ins[2];
-    //     scanf("%s", ins);
-    //     ins2 = (int)strtol(ins, NULL, 16);
-    //     instruction = (unsigned char)ins2;
-    //     executeInstruction(instructionSet, instruction);
-    // }
-
-
-/*
-switch (instruction){
-    case 0x00:
-        cycle(7);
-        haltCPU();
-        break;
-    case 0x01:
-        break;
-    case 0x05:
-        break;
-    case 0x06:
-        break;
-    case 0x08:
-        break;
-    case 0x09:
-        break;
-    case 0x0A:
-        break;
-    case 0x0D:
-        break;
-    case 0x0E:
-        break;
-
-    case 0x10:
-        break;
-    case 0x11:
-        break;
-    case 0x15:
-        break;
-    case 0x16:
-        break;
-    case 0x18:
-        break;
-    case 0x19:
-        break;
-    case 0x1D:
-        break;
-    case 0x1E:
-        break;
-    
-    case 0x20:
-        break;
-    case 0x21:
-        break;
-    case 0x24:
-        break;
-    case 0x25:
-        break;
-    case 0x26:
-        break;
-    case 0x28:
-        break;
-    case 0x29:
-        break;
-    case 0x2A:
-        break;
-    case 0x2C:
-        break;
-    case 0x2D:
-        break;
-    case 0x2E:
-        break;
-
-    case 0x30:
-        break;
-    case 0x31:
-        break;
-    case 0x35:
-        break;
-    case 0x36:
-        break;
-    case 0x38:
-        break;
-    case 0x39:
-        break;
-    case 0x3D:
-        break;
-    case 0x3E:
-        break;
-
-    case 0x40:
-        break;
-    case 0x41:
-        break;
-    case 0x45:
-        break;
-    case 0x46:
-        break;
-    case 0x48:
-        break;
-    case 0x49:
-        break;
-    case 0x4A:
-        break;
-    case 0x4C:
-        break;
-    case 0x4D:
-        break;
-    case 0x4E:
-        break;
-
-    case 0x50:
-        break;
-    case 0x51:
-        break;
-    case 0x55:
-        break;
-    case 0x56:
-        break;
-    case 0x58:
-        break;
-    case 0x59:
-        break;
-    case 0x5D:
-        break;
-    case 0x5E:
-        break;
-
-    case 0x60:
-        break;
-    case 0x61:
-        break;
-    case 0x65:
-        break;
-    case 0x66:
-        break;
-    case 0x68:
-        break;
-    case 0x69:
-        break;
-    case 0x6A:
-        break;
-    case 0x6C:
-        break;
-    case 0x6D:
-        break;
-    case 0x6E:
-        break;
-
-    case 0x70:
-        break;
-    case 0x71:
-        break;
-    case 0x75:
-        break;
-    case 0x76:
-        break;
-    case 0x78:
-        break;
-    case 0x79:
-        break;
-    case 0x7D:
-        break;
-    case 0x7E:
-        break;
-
-    case 0x81:
-        break;
-    case 0x84:
-        break;
-    case 0x85:
-        break;
-    case 0x86:
-        break;
-    case 0x88:
-        break;
-    case 0x8A:
-        break;
-    case 0x8C:
-        break;
-    case 0x8D:
-        break;
-    case 0x8E:
-        break;
-
-    case 0x90:
-        break;
-    case 0x91:
-        break;
-    case 0x94:
-        break;
-    case 0x95:
-        break;
-    case 0x96:
-        break;
-    case 0x98:
-        break;
-    case 0x99:
-        break;
-    case 0x9A:
-        break;
-    case 0x9D:
-        break;
-
-    case 0xA0:
-        break;
-    case 0xA1:
-        break;
-    case 0xA2:
-        break;
-    case 0xA4:
-        break;
-    case 0xA5:
-        break;
-    case 0xA6:
-        break;
-    case 0xA8:
-        break;
+// LDA
+void loadAcumulatorWithMemory(){
+    unsigned char opcode = memory[PC - 1];
+    printf("LDA\n");
+    char ll, hh;
+    switch (opcode){
+    // Inmediate
     case 0xA9:
+        accumulator = readFromMemory();
         break;
-    case 0xAA:
+        cycle(2);
+    // Zeropage
+    case 0xA5:
+        accumulator = memory[readFromMemory()];
         break;
-    case 0xAC:
-        break;
-    case 0xAD:
-        break;
-    case 0xAE:
-        break;
-
-    case 0xB0:
-        break;
-    case 0xB1:
-        break;
-    case 0xB4:
-        break;
+    // Zeropage, X 
     case 0xB5:
+        accumulator = memory[readFromMemory() + X];
         break;
-    case 0xB6:
+    // Absolute
+    case 0xAD:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        accumulator = memory[hh * 0x100 + ll];
         break;
-    case 0xB8:
-        break;
-    case 0xB9:
-        break;
-    case 0xBA:
-        break;
-    case 0xBC:
-        break;
+    // Absolute, X
     case 0xBD:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        accumulator = memory[addWithCarry(hh * 0x100 + ll, X)];
         break;
-    case 0xBE:
+    // Absolute, Y
+    case 0xB9:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        accumulator = memory[addWithCarry(hh * 0x100 + ll, Y)];
         break;
-
-    case 0xC0:
+    // (Indirect, X)
+    case 0xA1:
+        ll = readFromMemory();
+        accumulator = memory[memory[ll + X] * 0x100 + memory[ll + X + 1]];
         break;
-    case 0xC1:
-        break;
-    case 0xC4:
-        break;
-    case 0xC5:
-        break;
-    case 0xC6:
-        break;
-    case 0xC8:
-        break;
-    case 0xC9:
-        break;
-    case 0xCA:
-        break;
-    case 0xCC:
-        break;
-    case 0xCD:
-        break;
-    case 0xCE:
-        break;
-
-    case 0xD0:
-        break;
-    case 0xD1:
-        break;
-    case 0xD5:
-        break;
-    case 0xD6:
-        break;
-    case 0xD8:
-        break;
-    case 0xD9:
-        break;
-    case 0xDD:
-        break;
-    case 0xDE:
-        break;
-
-    case 0xE0:
-        break;
-    case 0xE1:
-        break;
-    case 0xE4:
-        break;
-    case 0xE5:
-        break;
-    case 0xE6:
-        break;
-    case 0xE8:
-        break;
-    case 0xE9:
-        break;
-    case 0xEA:
-        break;
-    case 0xEC:
-        break;
-    case 0xED:
-        break;
-    case 0xEE:
-        break;
-
-    case 0xF0:
-        break;
-    case 0xF1:
-        break;
-    case 0xF5:
-        break;
-    case 0xF6:
-        break;
-    case 0xF8:
-        break;
-    case 0xF9:
-        break;
-    case 0xFD:
-        break;
-    case 0xFE:
+    // (Indirect), Y
+    case 0xB1:
+        ll = readFromMemory();
+        accumulator = memory[addWithCarry(memory[ll] * 0x100 + memory[ll + 1], Y)];
         break;
     default:
         break;
     }
+}
 
-*/
+// STA
+void storeAccumulatorInMemory(){
+    unsigned char opcode = memory[PC - 1];
+    printf("STA\n");
+    char ll, hh;
+    switch (opcode){
+    // Zeropage
+    case 0x85:
+        memory[readFromMemory()] = accumulator;
+        break;
+    // Zeropage, X
+    case 0x95:
+        memory[readFromMemory() + X] = accumulator;
+        break;
+    // Absolute
+    case 0x8D:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        memory[hh * 0x100 + ll] = accumulator;
+        break;
+    // Absolute, X
+    case 0x9D:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        memory[addWithCarry(hh * 0x100 + ll, X)] = accumulator;
+        break;
+    // Absolute, Y
+    case 0x99:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        memory[addWithCarry(hh * 0x100 + ll, Y)] = accumulator;
+        break;
+    // (Indirect, X)
+    case 0x81:
+        ll = readFromMemory();
+        memory[memory[ll + X] * 0x100 + memory[ll + X + 1]] = accumulator;
+        break;
+    // (Indirect), Y
+    case 0x91:
+        ll = readFromMemory();
+        memory[addWithCarry(memory[ll] * 0x100 + memory[ll + 1], Y)] = accumulator;
+        break;
+    default:
+        break;
+    }
+}
+
