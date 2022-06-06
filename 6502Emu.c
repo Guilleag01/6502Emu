@@ -1,3 +1,6 @@
+// THE BIBLE: https://masswerk.at/6502/6502_instruction_set.html#ASL
+// GOD: https://www.youtube.com/c/BenEater
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -11,7 +14,7 @@ void executeInstruction(void (* instructionSet[])(), unsigned char instruction  
 void haltCPU();
 void cycle(unsigned int cycle);
 void initializeInstructionSet(void (* instructionSet[])());
-void loadFileToMemory(char * fileName, int offset);
+void loadFileToMemory(char * fileName, unsigned short offset);
 void run();
 char readFromMemory();
 void printStatus();
@@ -20,7 +23,7 @@ void storeAccumulatorInMemory();
 char addWithCarry(char a, char b);
 void addWithCarryIns();
 void andMemoryWithAccumulator();
-void arithmeticShiftLeft();
+void rotateOneBitLeft();
 void pushStack(char data);
 char popStack();
 void loadSystemVectors();
@@ -38,6 +41,31 @@ void clearCarryFlag();
 void clearDecimalMode();
 void clearInterruptDisableBit();
 void clearOverflowFlag();
+void shiftLeftOneBit();
+void compareMemoryWithAccumulator();
+void compareMemoryAndIndexX();
+void compareMemoryAndIndexY();
+void decrementMemoryByOne();
+void decrementIndexXByOne();
+void decrementIndexYByOne();
+void exclusiveOrWithAccumulator();
+void incrementMemoryByOne();
+void incrementIndexXByOne();
+void incrementIndexYByOne();
+void jumpToNewLocation();
+void jumpToNewLocationSavingReturnAdress();
+void loadIndexXWithMemory();
+void loadIndexYWithMemory();
+void shiftOneBitRight();
+void noOperation();
+void orMemoryWithAccumulator();
+void pushAccumulatorOnStack();
+void pushProcessorStatusOnStack();
+unsigned char statusToChar();
+void charToStatus(unsigned char c);
+void pullAccumulatorOnStack();
+void pullProcessorStatusOnStack();
+void rotateOneBitRight();
 
 char * memory;
 int cpuClock = 0;
@@ -63,43 +91,45 @@ bool useFrecuency = true;
 int main(){
     initializeInstructionSet(instructionSet);
     allocateMemory(&memory, 65535);
-    loadFileToMemory("programFile.bin", 200);
+    loadSystemVectors();
+    loadFileToMemory("ProgramFile.bin", 0x800);
     startup();
     run();
     printStatus();
-
-    // char a = 0x07;
-    // bool b = true;
-    // a = a & 0xfe;
-    // a = a | b;
-    // printf("%x\n", a);
-
-    // for(int i = 999; i <= 1001; i++){
+    // for(int i = 0x8000; i <= 0x8005; i++){
     //     printf(" %.2x", memory[i]);
     // }
     printf("\n");
 }
 
 void run(){
+    printStatus();
     while(!stopSignal){
         unsigned char instruction = (unsigned char)readFromMemory();
         executeInstruction(instructionSet, instruction);
+        //printStatus();
+        // for(int i = 0x8000; i <= 0x8005; i++){
+        //     printf(" %.2x", memory[i]);
+        // }
+        //printf("\n\n");
     }
 }
 
-void loadFileToMemory(char * fileName, int offset){
+void loadFileToMemory(char * fileName, unsigned short offset){
     FILE * file;
     file = fopen(fileName, "r");
     if(file != NULL){
-        int pos = 0;
+        unsigned short pos = offset;
         char c;
         while((c = fgetc(file)) != EOF){
+            //printf("%x: %.2x\n", pos, (unsigned char)c);
             memory[pos++] = (char) c;
         }
+        fclose(file);
     }else{
         printf("ERROR\n");
     }
-    fclose(file);
+    
 }
 
 void allocateMemory(char ** memory, int size){
@@ -109,8 +139,8 @@ void allocateMemory(char ** memory, int size){
 void loadSystemVectors(){
     // NMI (Non-Maskable Interrupt)
     // RES (Reset)
-    memory[0xFFFC] = 00;
-    memory[0xFFFD] = 02;
+    memory[0xFFFC] = 0x00;
+    memory[0xFFFD] = 0x08;
     // IRQ (Interrupt Request)
 }
 
@@ -136,7 +166,7 @@ void printStatus(){
     printf("\n======== GENERAL STATUS ========\n");
     printf("Clock: %d Frecuency: %f\n", cpuClock, frecuency);
     printf("=========== REGISTERS ==========\n");
-    printf("PC: %d Acc: %x X: %x Y: %x SP: %x\n", PC, accumulator, X, Y, SP);
+    printf("PC: %x Acc: %x X: %x Y: %x SP: %x\n", PC, accumulator, X, Y, SP);
     printf("Flags: N: %d V: %d B: %d D: %d I: %d Z: %d C: %d\n\n", SR[0], SR[1], SR[3], SR[4], SR[5], SR[6], SR[7]);
 }
 
@@ -169,6 +199,24 @@ void pushStack(char data){
 char popStack(){
     SP++;
     return memory[SP + 0x100 - 1];
+}
+
+unsigned char statusToChar(){
+    unsigned char c = 0;
+    unsigned char num = 0x80;
+    for(int i = 0; i < 8; i++){
+        c += SR[i] * num;
+        num /= 2;
+    }
+    return c;
+}
+
+void charToStatus(unsigned char c){
+    unsigned char num = 0x80;
+    for(int i = 0; i < 8; i++){
+        SR[i] = c & num;
+        num /= 2;
+    }
 }
 
 void initializeInstructionSet(void (* instructionSet[])()){
@@ -215,12 +263,19 @@ void initializeInstructionSet(void (* instructionSet[])()){
     instructionSet[0x21] = andMemoryWithAccumulator;
     instructionSet[0x31] = andMemoryWithAccumulator;
 
-    // AND
-    instructionSet[0x0A] = arithmeticShiftLeft;
-    instructionSet[0x06] = arithmeticShiftLeft;
-    instructionSet[0x16] = arithmeticShiftLeft;
-    instructionSet[0x0E] = arithmeticShiftLeft;
-    instructionSet[0x1E] = arithmeticShiftLeft;
+    // ASL
+    instructionSet[0x0A] = shiftLeftOneBit;
+    instructionSet[0x06] = shiftLeftOneBit;
+    instructionSet[0x16] = shiftLeftOneBit;
+    instructionSet[0x0E] = shiftLeftOneBit;
+    instructionSet[0x1E] = shiftLeftOneBit;
+
+    // ROL
+    instructionSet[0x2A] = rotateOneBitLeft;
+    instructionSet[0x26] = rotateOneBitLeft;
+    instructionSet[0x36] = rotateOneBitLeft;
+    instructionSet[0x2E] = rotateOneBitLeft;
+    instructionSet[0x3E] = rotateOneBitLeft;
 
     // BCC
     instructionSet[90] = branchOnCarryClear;
@@ -261,6 +316,120 @@ void initializeInstructionSet(void (* instructionSet[])()){
 
     // CLV
     instructionSet[0xB8] = clearOverflowFlag;
+
+    // CMP
+    instructionSet[0xC9] = compareMemoryWithAccumulator;
+    instructionSet[0xC5] = compareMemoryWithAccumulator;
+    instructionSet[0xD5] = compareMemoryWithAccumulator;
+    instructionSet[0xCD] = compareMemoryWithAccumulator;
+    instructionSet[0xDD] = compareMemoryWithAccumulator;
+    instructionSet[0xD9] = compareMemoryWithAccumulator;
+    instructionSet[0xC1] = compareMemoryWithAccumulator;
+    instructionSet[0xD1] = compareMemoryWithAccumulator;
+
+    // CPX
+    instructionSet[0xE0] = compareMemoryAndIndexX;
+    instructionSet[0xE4] = compareMemoryAndIndexX;
+    instructionSet[0xEC] = compareMemoryAndIndexX;
+
+    // CPY
+    instructionSet[0xC0] = compareMemoryAndIndexY;
+    instructionSet[0xC4] = compareMemoryAndIndexY;
+    instructionSet[0xCC] = compareMemoryAndIndexY;
+
+    // DEC
+    instructionSet[0xC6] = decrementMemoryByOne;
+    instructionSet[0xD6] = decrementMemoryByOne;
+    instructionSet[0xCE] = decrementMemoryByOne;
+    instructionSet[0xDE] = decrementMemoryByOne;
+
+    // DEX
+    instructionSet[0xCA] = decrementIndexXByOne;
+
+    // DEY
+    instructionSet[0x88] = decrementIndexYByOne;
+
+    // EOR
+    instructionSet[0x49] = exclusiveOrWithAccumulator;
+    instructionSet[0x45] = exclusiveOrWithAccumulator;
+    instructionSet[0x55] = exclusiveOrWithAccumulator;
+    instructionSet[0x4D] = exclusiveOrWithAccumulator;
+    instructionSet[0x5D] = exclusiveOrWithAccumulator;
+    instructionSet[0x59] = exclusiveOrWithAccumulator;
+    instructionSet[0x41] = exclusiveOrWithAccumulator;
+    instructionSet[0x51] = exclusiveOrWithAccumulator;
+    
+    // INC
+    instructionSet[0xE6] = incrementMemoryByOne;
+    instructionSet[0xF6] = incrementMemoryByOne;
+    instructionSet[0xEE] = incrementMemoryByOne;
+    instructionSet[0xFE] = incrementMemoryByOne;
+
+    // INX
+    instructionSet[0xE8] = incrementIndexXByOne;
+
+    // INY
+    instructionSet[0xC8] = incrementIndexYByOne;
+
+    // JMP
+    instructionSet[0x4C] = jumpToNewLocation;
+    instructionSet[0x6C] = jumpToNewLocation;
+
+    // JSR
+    instructionSet[0x20] = jumpToNewLocationSavingReturnAdress;
+
+    // LDX
+    instructionSet[0xA2] = loadIndexXWithMemory;
+    instructionSet[0xA6] = loadIndexXWithMemory;
+    instructionSet[0xB6] = loadIndexXWithMemory;
+    instructionSet[0xAE] = loadIndexXWithMemory;
+    instructionSet[0xBE] = loadIndexXWithMemory;
+
+    // LDY
+    instructionSet[0xA0] = loadIndexYWithMemory;
+    instructionSet[0xA4] = loadIndexYWithMemory;
+    instructionSet[0xB4] = loadIndexYWithMemory;
+    instructionSet[0xAC] = loadIndexYWithMemory;
+    instructionSet[0xBC] = loadIndexYWithMemory;
+
+    // LSR
+    instructionSet[0x4A] = shiftOneBitRight;
+    instructionSet[0x46] = shiftOneBitRight;
+    instructionSet[0x56] = shiftOneBitRight;
+    instructionSet[0x4E] = shiftOneBitRight;
+    instructionSet[0x5E] = shiftOneBitRight;
+
+    // NOP
+    instructionSet[0xEA] = noOperation;
+
+    // ORA
+    instructionSet[0x09] = orMemoryWithAccumulator;
+    instructionSet[0x05] = orMemoryWithAccumulator;
+    instructionSet[0x15] = orMemoryWithAccumulator;
+    instructionSet[0x0D] = orMemoryWithAccumulator;
+    instructionSet[0x1D] = orMemoryWithAccumulator;
+    instructionSet[0x19] = orMemoryWithAccumulator;
+    instructionSet[0x01] = orMemoryWithAccumulator;
+    instructionSet[0x11] = orMemoryWithAccumulator;
+
+    // PHA
+    instructionSet[0x48] = pushAccumulatorOnStack;
+
+    // PHP
+    instructionSet[0x08] = pushProcessorStatusOnStack;
+
+    // PLA
+    instructionSet[0x68] = pullAccumulatorOnStack;
+
+    // PLP
+    instructionSet[0x28] = pullProcessorStatusOnStack;
+
+    // ROR
+    instructionSet[0x6A] = rotateOneBitRight;
+    instructionSet[0x66] = rotateOneBitRight;
+    instructionSet[0x76] = rotateOneBitRight;
+    instructionSet[0x6E] = rotateOneBitRight;
+    instructionSet[0x7E] = rotateOneBitRight;
 }
 
 void executeInstruction(void (* instructionSet[])(), unsigned char instruction){
@@ -269,7 +438,7 @@ void executeInstruction(void (* instructionSet[])(), unsigned char instruction){
 
 // BRK
 void haltCPU(){
-    printf("System halted\n");
+    printf("BRK\nSystem halted\n");
     cycle(7);
     stopSignal = true;
     SR[5] = true;
@@ -281,7 +450,7 @@ void loadAcumulatorWithMemory(){
     printf("LDA\n");
     unsigned char ll, hh;
     switch (opcode){
-    // Inmediate
+    // Immediate
     case 0xA9:
         accumulator = readFromMemory();
         cycle(2);
@@ -502,36 +671,36 @@ void andMemoryWithAccumulator(){
     SR[6] = accumulator == 0 ? true : false;
 }
 
-// ASL
-void arithmeticShiftLeft(){
+// ROL
+void rotateOneBitLeft(){
     unsigned char opcode = memory[PC - 1];
-    printf("ASL\n");
+    printf("ROL\n");
     char ll, hh;
     bool c = SR[7];
     bool c2 = false;
     switch (opcode){
-    case 0x0A:
+    case 0x2A:
         accumulator <<= 1;
         c2 = accumulator & 0x01;
         accumulator = accumulator & 0xfe;
         accumulator = accumulator | c;
         cycle(2);
         break;
-    case 0x06:
+    case 0x26:
         memory[readFromMemory()] <<= 1;
         c2 = memory[readFromMemory()] & 0x01;
         memory[readFromMemory()] = memory[readFromMemory()] & 0xfe;
         memory[readFromMemory()] = memory[readFromMemory()] | c;
         cycle(5);
         break;
-    case 0x16:
+    case 0x36:
         memory[readFromMemory() + X] <<= 1;
         c2 = memory[readFromMemory() + X] & 0x01;
         memory[readFromMemory() + X] = memory[readFromMemory() + X] & 0xfe;
         memory[readFromMemory() + X] = memory[readFromMemory() + X] | c;
         cycle(6);
         break;
-    case 0x0E:
+    case 0x2E:
         ll = readFromMemory();
         hh = readFromMemory();
         memory[hh * 0x100 + ll] <<= 1;
@@ -540,7 +709,7 @@ void arithmeticShiftLeft(){
         memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] | c;
         cycle(6);
         break;
-    case 0x1E:
+    case 0x3E:
         ll = readFromMemory();
         hh = readFromMemory();
         memory[addWithCarry(hh * 0x100 + ll, X)] <<= 1;
@@ -560,16 +729,65 @@ void arithmeticShiftLeft(){
     SR[7] = accumulator & c2;
 }
 
+// ASL
+void shiftLeftOneBit(){
+    unsigned char opcode = memory[PC - 1];
+    printf("ROL\n");
+    char ll, hh;
+    bool c = SR[7];
+    bool c2 = false;
+    switch (opcode){
+    case 0x2A:
+        accumulator <<= 1;
+        c2 = accumulator & 0x01;
+        accumulator = accumulator & 0xfe;
+        cycle(2);
+        break;
+    case 0x26:
+        memory[readFromMemory()] <<= 1;
+        c2 = memory[readFromMemory()] & 0x01;
+        memory[readFromMemory()] = memory[readFromMemory()] & 0xfe;
+        cycle(5);
+        break;
+    case 0x36:
+        memory[readFromMemory() + X] <<= 1;
+        c2 = memory[readFromMemory() + X] & 0x01;
+        memory[readFromMemory() + X] = memory[readFromMemory() + X] & 0xfe;
+        cycle(6);
+        break;
+    case 0x2E:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        memory[hh * 0x100 + ll] <<= 1;
+        c2 = memory[hh * 0x100 + ll] & 0x01;
+        memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] & 0xfe;
+        cycle(6);
+        break;
+    case 0x3E:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        memory[addWithCarry(hh * 0x100 + ll, X)] <<= 1;
+        c2 = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x01;
+        memory[addWithCarry(hh * 0x100 + ll, X)] = memory[addWithCarry(hh * 0x100 + ll, X)] & 0xfe;
+        cycle(7);
+        break;
+    
+    default:
+        break;
+    }
+
+    // Flags
+    SR[0] = accumulator < 0 ? true : false;
+    SR[6] = accumulator == 0 ? true : false;
+    SR[7] = accumulator & c2;
+}
+
 // BCC
 void branchOnCarryClear(){
     printf("BCC\n");
     char offset = readFromMemory();
     if(!SR[7]){
-        char ll = (char)(PC & 0x00FF);
-        char hh = (char)(PC & 0xFF00);
-        pushStack(ll);
-        pushStack(hh);
-        PC = hh * 0x100 + ll + offset;
+        PC += offset;
         cycle(1);
     }
     cycle(2);
@@ -580,11 +798,7 @@ void branchOnCarrySet(){
     printf("BCS\n");
     char offset = readFromMemory();
     if(SR[7]){
-        char ll = (char)(PC & 0x00FF);
-        char hh = (char)(PC & 0xFF00);
-        pushStack(ll);
-        pushStack(hh);
-        PC = hh * 0x100 + ll + offset;
+        PC += offset;
         cycle(1);
     }
     cycle(2);
@@ -595,11 +809,7 @@ void branchOnResultZero(){
     printf("BEQ\n");
     char offset = readFromMemory();
     if(SR[6]){
-        char ll = (char)(PC & 0x00FF);
-        char hh = (char)(PC & 0xFF00);
-        pushStack(ll);
-        pushStack(hh);
-        PC = hh * 0x100 + ll + offset;
+        PC += offset;
         cycle(1);
     }
     cycle(2);
@@ -639,11 +849,7 @@ void branchOnResultMinus(){
     printf("BMI\n");
     char offset = readFromMemory();
     if(SR[0]){
-        char ll = (char)(PC & 0x00FF);
-        char hh = (char)(PC & 0xFF00);
-        pushStack(ll);
-        pushStack(hh);
-        PC = hh * 0x100 + ll + offset;
+        PC += offset;
         cycle(1);
     }
     cycle(2);
@@ -654,11 +860,7 @@ void branchOnResultNotZero(){
     printf("BNE\n");
     char offset = readFromMemory();
     if(!SR[6]){
-        char ll = (char)(PC & 0x00FF);
-        char hh = (char)(PC & 0xFF00);
-        pushStack(ll);
-        pushStack(hh);
-        PC = hh * 0x100 + ll + offset;
+        PC += offset;
         cycle(1);
     }
     cycle(2);
@@ -669,11 +871,7 @@ void branchOnResultPlus(){
     printf("BPL\n");
     char offset = readFromMemory();
     if(!SR[0]){
-        char ll = (char)(PC & 0x00FF);
-        char hh = (char)(PC & 0xFF00);
-        pushStack(ll);
-        pushStack(hh);
-        PC = hh * 0x100 + ll + offset;
+        PC += offset;
         cycle(1);
     }
     cycle(2);
@@ -685,11 +883,7 @@ void branchOnOverflowClear(){
     char offset = readFromMemory();
     char ll, hh;
     if(!SR[1]){
-        ll = (char)(PC & 0x00FF);
-        hh = (char)(PC & 0xFF00);
-        pushStack(ll);
-        pushStack(hh);
-        PC = hh * 0x100 + ll + offset;
+        PC += offset;
         cycle(1);
     }
     cycle(2);
@@ -701,11 +895,7 @@ void branchOnOverflowSet(){
     char offset = readFromMemory();
     char ll, hh;
     if(SR[1]){
-        ll = (char)(PC & 0x00FF);
-        hh = (char)(PC & 0xFF00);
-        pushStack(ll);
-        pushStack(hh);
-        PC = hh * 0x100 + ll + offset;
+        PC += offset;
         cycle(1);
     }
     cycle(2);
@@ -737,6 +927,616 @@ void clearOverflowFlag(){
     printf("CLV\n");
     SR[2] = false;
     cycle(2);
+}
+
+// CMP
+void compareMemoryWithAccumulator(){
+    unsigned char opcode = memory[PC - 1];
+    printf("CMP\n");
+    unsigned char ll, hh;
+    char result;
+    switch (opcode){
+    // Immediate
+    case 0xC9:
+        result = accumulator - readFromMemory();
+        cycle(2);
+        break;
+    // Zeropage
+    case 0xC5:
+        result = accumulator - memory[readFromMemory()];
+        cycle(3);
+        break;
+    // Zeropage, X
+    case 0xD5:
+        result = accumulator - memory[readFromMemory() + X];
+        cycle(4);
+        break;
+    // Absolute
+    case 0xCD:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        result = accumulator - memory[hh * 0x100 + ll];
+        cycle(4);
+        break;
+    // Absolute, X
+    case 0xDD:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        result = accumulator - memory[addWithCarry(hh * 0x100 + ll, X)];
+        cycle(4);
+        break;
+    // Absolute, Y
+    case 0xD9:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        result = accumulator - memory[addWithCarry(hh * 0x100 + ll, Y)];
+        cycle(4);
+        break;
+    // (Indirect, X)
+    case 0xC1:
+        ll = readFromMemory();
+        result = accumulator - memory[memory[ll + X] * 0x100 + memory[ll + X + 1]];
+        cycle(6);
+        break;
+    // (Indirect), Y
+    case 0xD1:
+        ll = readFromMemory();
+        result = accumulator - memory[addWithCarry(memory[ll] * 0x100 + memory[ll + 1], Y)];
+        cycle(5);
+        break;
+    
+    default:
+        break;
+    }
+
+    // Flags
+    SR[0] = result < 0 ? true : false;
+    SR[6] = result == 0 ? true : false;
+}
+
+// CPX
+void compareMemoryAndIndexX(){
+    unsigned char opcode = memory[PC - 1];
+    printf("CPX\n");
+    unsigned char ll, hh;
+    char result;
+    switch (opcode){
+    case 0xE0:
+        result = X - readFromMemory();
+        cycle(2);
+        break;
+    case 0xE4:
+        result = X - memory[readFromMemory()];
+        cycle(3);
+        break;
+    case 0xEC:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        result = X - memory[hh * 0x100 + ll];
+        cycle(4);
+        break;
+    
+    default:
+        break;
+    }
+
+    // Flags
+    SR[0] = result < 0 ? true : false;
+    SR[6] = result == 0 ? true : false;    
+}
+
+// CPY
+void compareMemoryAndIndexY(){
+    unsigned char opcode = memory[PC - 1];
+    printf("CPY\n");
+    unsigned char ll, hh;
+    char result;
+    switch (opcode){
+    case 0xE0:
+        result = Y - readFromMemory();
+        cycle(2);
+        break;
+    case 0xE4:
+        result = Y - memory[readFromMemory()];
+        cycle(3);
+        break;
+    case 0xEC:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        result = Y - memory[hh * 0x100 + ll];
+        cycle(4);
+        break;
+    
+    default:
+        break;
+    }
+
+    // Flags
+    SR[0] = result < 0 ? true : false;
+    SR[6] = result == 0 ? true : false;    
+}
+
+// DEC
+void decrementMemoryByOne(){
+    unsigned char opcode = memory[PC - 1];
+    printf("DEC\n");
+    unsigned char ll, hh;
+    char result;
+    switch (opcode){
+    case 0xC6:
+        result = --memory[readFromMemory()];
+        cycle(0);
+        break;
+    case 0xD6:
+        result = --memory[readFromMemory() + X];
+        cycle(0);
+        break;
+    case 0xCE:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        result = --memory[hh * 0x100 + ll];
+        cycle(0);
+        break;
+    case 0xDE:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        result = --memory[addWithCarry(hh * 0x100 + ll, X)];
+        cycle(0);
+        break;
+    
+    default:
+        break;
+    }
+
+    // Flags
+    SR[0] = result < 0 ? true : false;
+    SR[6] = result == 0 ? true : false;
+}
+
+// DEX
+void decrementIndexXByOne(){
+    printf("DEX\n");
+    X--;
+
+    // Flags
+    SR[0] = X < 0 ? true : false;
+    SR[6] = X == 0 ? true : false;
+}
+
+// DEY
+void decrementIndexYByOne(){
+    printf("DEY\n");
+    Y--;
+
+    // Flags
+    SR[0] = Y < 0 ? true : false;
+    SR[6] = Y == 0 ? true : false;
+}
+
+// EOR
+void exclusiveOrWithAccumulator(){
+    unsigned char opcode = memory[PC - 1];
+    printf("EOR\n");
+    char ll, hh;
+    switch (opcode){
+    case 0x49:
+        accumulator = accumulator ^ readFromMemory();
+        cycle(2);
+        break;
+    case 0x45:
+        accumulator = accumulator ^ memory[readFromMemory()]; 
+        cycle(3);
+        break;
+    case 0x55:
+        accumulator = accumulator ^ memory[readFromMemory() + X];
+        cycle(4);
+        break;
+    case 0x4D:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        accumulator = accumulator ^ memory[hh * 0x100 + ll]; 
+        cycle(4);
+        break;
+    case 0x5D:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        accumulator = accumulator ^ memory[addWithCarry(hh * 0x100 + ll, X)]; 
+        cycle(4);
+        break;
+    case 0x59:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        accumulator = accumulator ^ memory[addWithCarry(hh * 0x100 + ll, Y)]; 
+        cycle(4);
+        break;
+    case 0x41:
+        ll = readFromMemory();
+        accumulator = accumulator ^ memory[memory[ll + X] * 0x100 + memory[ll + X + 1]];
+        cycle(6);
+        break;
+    case 0x51:
+        accumulator = accumulator ^ memory[addWithCarry(memory[ll] * 0x100 + memory[ll + 1], Y)];
+        cycle(5);
+        break;
+    
+    default:
+        break;
+    }
+
+    // Flags
+    SR[0] = accumulator < 0 ? true : false;
+    SR[6] = accumulator == 0 ? true : false;
+}
+
+// INC
+void incrementMemoryByOne(){
+    unsigned char opcode = memory[PC - 1];
+    printf("INC\n");
+    unsigned char ll, hh;
+    char result;
+    switch (opcode){
+    case 0xC6:
+        result = ++memory[readFromMemory()];
+        cycle(0);
+        break;
+    case 0xD6:
+        result = ++memory[readFromMemory() + X];
+        cycle(0);
+        break;
+    case 0xCE:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        result = ++memory[hh * 0x100 + ll];
+        cycle(0);
+        break;
+    case 0xDE:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        result = ++memory[addWithCarry(hh * 0x100 + ll, X)];
+        cycle(0);
+        break;
+    
+    default:
+        break;
+    }
+
+    // Flags
+    SR[0] = result < 0 ? true : false;
+    SR[6] = result == 0 ? true : false;
+}
+
+// INX
+void incrementIndexXByOne(){
+    printf("INX\n");
+    X++;
+
+    // Flags
+    SR[0] = X < 0 ? true : false;
+    SR[6] = X == 0 ? true : false;
+}
+
+// INY
+void incrementIndexYByOne(){
+    printf("INY\n");
+    Y++;
+
+    // Flags
+    SR[0] = Y < 0 ? true : false;
+    SR[6] = Y == 0 ? true : false;
+}
+
+// JMP
+void jumpToNewLocation(){
+    unsigned char opcode = memory[PC - 1];
+    printf("INC\n");
+    unsigned char ll, hh;
+    switch (opcode){
+    case 0x4C:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        PC = hh * 0x100 + ll;
+        cycle(3);
+        break;
+    case 0x6C:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        PC = memory[hh * 0x100 + ll] * 0x100 + memory[hh * 0x100 + ll + 1];
+        cycle(5);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+// JSR
+void jumpToNewLocationSavingReturnAdress(){
+    printf("JSR\n");
+    unsigned char ll, hh;
+    ll = (char)(PC & 0x00FF);
+    hh = (char)(PC & 0xFF00);
+    pushStack(ll + 2);
+    pushStack(hh);
+    ll = readFromMemory();
+    hh = readFromMemory();
+    PC = (unsigned short)(hh * 0x100 + ll);
+    cycle(6);
+}
+
+// LDX
+void loadIndexXWithMemory(){
+    unsigned char opcode = memory[PC - 1];
+    printf("LDX\n");
+    unsigned char ll, hh;
+    switch (opcode){
+    case 0xA2:
+        X = readFromMemory();
+        cycle(2);
+        break;
+    case 0xA6:
+        X = memory[readFromMemory()];
+        cycle(3);
+        break;
+    case 0xB6:
+        X = memory[readFromMemory() + Y];
+        cycle(4);
+        break;
+    case 0xAE:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        X = memory[hh * 0x100 + ll];
+        cycle(4);
+        break;
+    case 0xBE:
+        ll = readFromMemory();
+        X = memory[addWithCarry(memory[ll] * 0x100 + memory[ll + 1], Y)];
+        cycle(4);
+        break;
+
+    default:
+        break;
+    }
+
+    SR[0] = X < 0 ? true : false;
+    SR[6] = X == 0 ? true : false;
+}
+
+// LDY
+void loadIndexYWithMemory(){
+    unsigned char opcode = memory[PC - 1];
+    printf("LDY\n");
+    unsigned char ll, hh;
+    switch (opcode){
+    case 0xA0:
+        Y = readFromMemory();
+        cycle(2);
+        break;
+    case 0xA4:
+        Y = memory[readFromMemory()];
+        cycle(3);
+        break;
+    case 0xB4:
+        Y = memory[readFromMemory() + X];
+        cycle(4);
+        break;
+    case 0xAC:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        Y = memory[hh * 0x100 + ll];
+        cycle(4);
+        break;
+    case 0xBC:
+        ll = readFromMemory();
+        Y = memory[addWithCarry(memory[ll] * 0x100 + memory[ll + 1], X)];
+        cycle(4);
+        break;
+
+    default:
+        break;
+    }
+
+    SR[0] = Y < 0 ? true : false;
+    SR[6] = Y == 0 ? true : false;
+}
+
+// LSR
+void shiftOneBitRight(){
+    unsigned char opcode = memory[PC - 1];
+    printf("LSR\n");
+    char ll, hh;
+    bool c = SR[7];
+    bool c2 = false;
+    switch (opcode){
+    case 0x4A:
+        accumulator >>= 1;
+        c2 = accumulator & 0x80;
+        accumulator = accumulator & 0x7F;
+        cycle(2);
+        break;
+    case 0x46:
+        memory[readFromMemory()] >>= 1;
+        c2 = memory[readFromMemory()] & 0x80;
+        memory[readFromMemory()] = memory[readFromMemory()] & 0x7F;
+        cycle(5);
+        break;
+    case 0x56:
+        memory[readFromMemory() + X] >>= 1;
+        c2 = memory[readFromMemory() + X] & 0x80;
+        memory[readFromMemory() + X] = memory[readFromMemory() + X] & 0x7F;
+        cycle(6);
+        break;
+    case 0x4E:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        memory[hh * 0x100 + ll] <<= 1;
+        c2 = memory[hh * 0x100 + ll] & 0x80;
+        memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] & 0x7F;
+        cycle(6);
+        break;
+    case 0x5E:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        memory[addWithCarry(hh * 0x100 + ll, X)] <<= 1;
+        c2 = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x80;
+        memory[addWithCarry(hh * 0x100 + ll, X)] = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x7F;
+        cycle(7);
+        break;
+    
+    default:
+        break;
+    }
+
+    // Flags
+    SR[0] = false;
+    SR[6] = accumulator == 0 ? true : false;
+    SR[7] = c2;
+}
+
+// NOP
+void noOperation(){
+    printf("NOP\n");
+    cycle(2);
+}
+
+// ORA
+void orMemoryWithAccumulator(){
+    unsigned char opcode = memory[PC - 1];
+    printf("ORA\n");
+    char ll, hh;
+    switch (opcode){
+    case 0x09:
+        accumulator = accumulator ^ readFromMemory();
+        cycle(2);
+        break;
+    case 0x05:
+        accumulator = accumulator ^ memory[readFromMemory()]; 
+        cycle(3);
+        break;
+    case 0x15:
+        accumulator = accumulator ^ memory[readFromMemory() + X];
+        cycle(4);
+        break;
+    case 0x0D:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        accumulator = accumulator ^ memory[hh * 0x100 + ll]; 
+        cycle(4);
+        break;
+    case 0x1D:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        accumulator = accumulator ^ memory[addWithCarry(hh * 0x100 + ll, X)]; 
+        cycle(4);
+        break;
+    case 0x19:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        accumulator = accumulator ^ memory[addWithCarry(hh * 0x100 + ll, Y)]; 
+        cycle(4);
+        break;
+    case 0x01:
+        ll = readFromMemory();
+        accumulator = accumulator ^ memory[memory[ll + X] * 0x100 + memory[ll + X + 1]];
+        cycle(6);
+        break;
+    case 0x11:
+        accumulator = accumulator ^ memory[addWithCarry(memory[ll] * 0x100 + memory[ll + 1], Y)];
+        cycle(5);
+        break;
+    
+    default:
+        break;
+    }
+
+    // Flags
+    SR[0] = accumulator < 0 ? true : false;
+    SR[6] = accumulator == 0 ? true : false;
+}
+
+// PHA
+void pushAccumulatorOnStack(){
+    printf("PHA\n");
+    pushStack(accumulator);
+    cycle(3);
+}
+
+// PHP
+void pushProcessorStatusOnStack(){
+    printf("PHP\n");
+    pushStack(statusToChar());
+    cycle(3);
+}
+
+// PLA
+void pullAccumulatorOnStack(){
+    printf("PLA\n");
+    accumulator = popStack();
+    cycle(3);
+}
+
+// PLP
+void pullProcessorStatusOnStack(){
+    printf("PLP\n");
+    charToStatus(popStack());
+    cycle(3);
+}
+
+// ROR
+void rotateOneBitRight(){
+    unsigned char opcode = memory[PC - 1];
+    printf("ROR\n");
+    char ll, hh;
+    bool c = SR[7];
+    bool c2 = false;
+    switch (opcode){
+    case 0x2A:
+        accumulator >>= 1;
+        c2 = accumulator & 0x80;
+        accumulator = accumulator & 0x7F;
+        accumulator = accumulator | c * 0x80;
+        cycle(2);
+        break;
+    case 0x26:
+        memory[readFromMemory()] >>= 1;
+        c2 = memory[readFromMemory()] & 0x80;
+        memory[readFromMemory()] = memory[readFromMemory()] & 0x7F;
+        memory[readFromMemory()] = memory[readFromMemory()] | c * 0x80;
+        cycle(5);
+        break;
+    case 0x36:
+        memory[readFromMemory() + X] >>= 1;
+        c2 = memory[readFromMemory() + X] & 0x80;
+        memory[readFromMemory() + X] = memory[readFromMemory() + X] & 0x7F;
+        memory[readFromMemory() + X] = memory[readFromMemory() + X] | c * 0x80;
+        cycle(6);
+        break;
+    case 0x2E:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        memory[hh * 0x100 + ll] >>= 1;
+        c2 = memory[hh * 0x100 + ll] & 0x80;
+        memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] & 0x7F;
+        memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] | c * 0x80;
+        cycle(6);
+        break;
+    case 0x3E:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        memory[addWithCarry(hh * 0x100 + ll, X)] >>= 1;
+        c2 = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x80;
+        memory[addWithCarry(hh * 0x100 + ll, X)] = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x7F;
+        memory[addWithCarry(hh * 0x100 + ll, X)] = memory[addWithCarry(hh * 0x100 + ll, X)] | c * 0x80;
+        cycle(7);
+        break;
+    
+    default:
+        break;
+    }
+
+    // Flags
+    SR[0] = accumulator < 0 ? true : false;
+    SR[6] = accumulator == 0 ? true : false;
+    SR[7] = accumulator & c2 * 0x80;
 }
 
 
