@@ -63,9 +63,24 @@ void pushAccumulatorOnStack();
 void pushProcessorStatusOnStack();
 unsigned char statusToChar();
 void charToStatus(unsigned char c);
-void pullAccumulatorOnStack();
-void pullProcessorStatusOnStack();
+void pullAccumulatorOffStack();
+void pullProcessorStatusOffStack();
 void rotateOneBitRight();
+void returnFromIterrupt();
+void returnFromSubroutine();
+void substractMemoryFromAccumulatorWithBorrow();
+char substractWithBorrow(char a, char b);
+void setCarryFlag();
+void setDecimalFlag();
+void setInterruptDisableStatus();
+void storeIndexXInMemory();
+void storeIndexYInMemory();
+void transferAccumulatorToIndexX();
+void transferAccumulatorToIndexY();
+void transferStackPointerToIndexX();
+void transferIndexXToAccumulator();
+void transferIndexXToStackRegister();
+void transferIndexYToAccumulator();
 
 char * memory;
 int cpuClock = 0;
@@ -96,6 +111,9 @@ int main(){
     startup();
     run();
     printStatus();
+
+    //printf("%x", EOF);
+
     // for(int i = 0x8000; i <= 0x8005; i++){
     //     printf(" %.2x", memory[i]);
     // }
@@ -120,16 +138,24 @@ void loadFileToMemory(char * fileName, unsigned short offset){
     file = fopen(fileName, "r");
     if(file != NULL){
         unsigned short pos = offset;
-        char c;
-        while((c = fgetc(file)) != EOF){
-            //printf("%x: %.2x\n", pos, (unsigned char)c);
+        unsigned char c;
+        fseek(file, 0, SEEK_END);
+        int fileSize = ftell(file);
+        fseek(file, 0, SEEK_SET);
+        for(int i = 0; i < fileSize; i++){
+            c = fgetc(file);
+            printf("%x: %.2x\n", pos, c);
             memory[pos++] = (char) c;
         }
+
+        // while((c = fgetc(file)) != EOF){
+        //     printf("%x: %.2x\n", pos, c);
+        //     memory[pos++] = (char) c;
+        // }
         fclose(file);
     }else{
         printf("ERROR\n");
     }
-    
 }
 
 void allocateMemory(char ** memory, int size){
@@ -182,13 +208,36 @@ char addWithCarry(char a, char b){
 
     unsigned char ua = (unsigned char)a;
     unsigned char ub = (unsigned char)b;
-    if (ua + ub < a && ua + ub < ub){
+    printf("%x + %x = %x\n", ua, ub, ua+ub);
+    if ((unsigned char)(ua + ub) < ua || (unsigned char)(ua + ub) < ub){
         SR[7] = true;
     }else{
         SR[7] = false;
     }
 
     return a + b + c;
+}
+
+char substractWithBorrow(char a, char b){
+    bool c = SR[7];
+    if(a > 0 && b > 0 && a - b - c < 0){
+        SR[1] = true;
+    }else if(a < 0 && b < 0 && a - b - c > 0){
+        SR[1] = true;
+    }else{
+        SR[1] = false;
+    }
+
+    unsigned char ua = (unsigned char)a;
+    unsigned char ub = (unsigned char)b;
+    printf("%x - %x = %x\n", ua, ub, ua-ub);
+    if ((unsigned char)(ua - ub) > ua || (unsigned char)(ua - ub) > ub){
+        SR[7] = true;
+    }else{
+        SR[7] = false;
+    }
+
+    return a - b - c;
 }
 
 void pushStack(char data){
@@ -220,6 +269,7 @@ void charToStatus(unsigned char c){
 }
 
 void initializeInstructionSet(void (* instructionSet[])()){
+    
 
     // BRK
     instructionSet[0x00] = haltCPU;
@@ -419,10 +469,10 @@ void initializeInstructionSet(void (* instructionSet[])()){
     instructionSet[0x08] = pushProcessorStatusOnStack;
 
     // PLA
-    instructionSet[0x68] = pullAccumulatorOnStack;
+    instructionSet[0x68] = pullAccumulatorOffStack;
 
     // PLP
-    instructionSet[0x28] = pullProcessorStatusOnStack;
+    instructionSet[0x28] = pullProcessorStatusOffStack;
 
     // ROR
     instructionSet[0x6A] = rotateOneBitRight;
@@ -430,10 +480,63 @@ void initializeInstructionSet(void (* instructionSet[])()){
     instructionSet[0x76] = rotateOneBitRight;
     instructionSet[0x6E] = rotateOneBitRight;
     instructionSet[0x7E] = rotateOneBitRight;
+
+    // RTI
+    instructionSet[0x40] = returnFromIterrupt;
+
+    // RTS
+    instructionSet[0x60] = returnFromSubroutine;
+
+    // SBC
+    instructionSet[0xE9] = substractMemoryFromAccumulatorWithBorrow;
+    instructionSet[0xE5] = substractMemoryFromAccumulatorWithBorrow;
+    instructionSet[0xF5] = substractMemoryFromAccumulatorWithBorrow;
+    instructionSet[0xED] = substractMemoryFromAccumulatorWithBorrow;
+    instructionSet[0xFD] = substractMemoryFromAccumulatorWithBorrow;
+    instructionSet[0xF9] = substractMemoryFromAccumulatorWithBorrow;
+    instructionSet[0xE1] = substractMemoryFromAccumulatorWithBorrow;
+    instructionSet[0xF1] = substractMemoryFromAccumulatorWithBorrow;
+
+    // SEC
+    instructionSet[0x38] = setCarryFlag;
+
+    // SED
+    instructionSet[0xF8] = setDecimalFlag;
+
+    // SEI
+    instructionSet[0x78] = setInterruptDisableStatus;
+
+    // STX
+    instructionSet[0x86] = storeIndexXInMemory;
+    instructionSet[0x96] = storeIndexXInMemory;
+    instructionSet[0x8E] = storeIndexXInMemory;
+
+    // STY
+    instructionSet[0x84] = storeIndexYInMemory;
+    instructionSet[0x94] = storeIndexYInMemory;
+    instructionSet[0x8C] = storeIndexYInMemory;
+
+    // TAX
+    instructionSet[0xAA] = transferAccumulatorToIndexX;
+
+    // TAY
+    instructionSet[0xA8] = transferAccumulatorToIndexY;
+
+    // TSX
+    instructionSet[0xBA] = transferStackPointerToIndexX;
+
+    // TXA
+    instructionSet[0x8A] = transferIndexXToAccumulator;
+
+    // TXS
+    instructionSet[0x9A] = transferIndexXToStackRegister;
+
+    // TYA
+    instructionSet[0x98] = transferIndexYToAccumulator;
 }
 
 void executeInstruction(void (* instructionSet[])(), unsigned char instruction){
-    instructionSet[instruction]();
+    instructionSet[instruction](); 
 }
 
 // BRK
@@ -675,7 +778,7 @@ void andMemoryWithAccumulator(){
 void rotateOneBitLeft(){
     unsigned char opcode = memory[PC - 1];
     printf("ROL\n");
-    char ll, hh;
+    unsigned char ll, hh;
     bool c = SR[7];
     bool c2 = false;
     switch (opcode){
@@ -1117,7 +1220,7 @@ void decrementIndexYByOne(){
 void exclusiveOrWithAccumulator(){
     unsigned char opcode = memory[PC - 1];
     printf("EOR\n");
-    char ll, hh;
+    unsigned char ll, hh;
     switch (opcode){
     case 0x49:
         accumulator = accumulator ^ readFromMemory();
@@ -1255,8 +1358,8 @@ void jumpToNewLocationSavingReturnAdress(){
     unsigned char ll, hh;
     ll = (char)(PC & 0x00FF);
     hh = (char)(PC & 0xFF00);
-    pushStack(ll + 2);
     pushStack(hh);
+    pushStack(ll + 2);
     ll = readFromMemory();
     hh = readFromMemory();
     PC = (unsigned short)(hh * 0x100 + ll);
@@ -1402,7 +1505,7 @@ void noOperation(){
 void orMemoryWithAccumulator(){
     unsigned char opcode = memory[PC - 1];
     printf("ORA\n");
-    char ll, hh;
+    unsigned char ll, hh;
     switch (opcode){
     case 0x09:
         accumulator = accumulator ^ readFromMemory();
@@ -1468,14 +1571,18 @@ void pushProcessorStatusOnStack(){
 }
 
 // PLA
-void pullAccumulatorOnStack(){
+void pullAccumulatorOffStack(){
     printf("PLA\n");
     accumulator = popStack();
     cycle(3);
+
+    // Flags
+    SR[0] = accumulator < 0 ? true : false;
+    SR[6] = accumulator == 0 ? true : false;
 }
 
 // PLP
-void pullProcessorStatusOnStack(){
+void pullProcessorStatusOffStack(){
     printf("PLP\n");
     charToStatus(popStack());
     cycle(3);
@@ -1485,32 +1592,32 @@ void pullProcessorStatusOnStack(){
 void rotateOneBitRight(){
     unsigned char opcode = memory[PC - 1];
     printf("ROR\n");
-    char ll, hh;
+    unsigned char ll, hh;
     bool c = SR[7];
     bool c2 = false;
     switch (opcode){
-    case 0x2A:
+    case 0x6A:
         accumulator >>= 1;
         c2 = accumulator & 0x80;
         accumulator = accumulator & 0x7F;
         accumulator = accumulator | c * 0x80;
         cycle(2);
         break;
-    case 0x26:
+    case 0x66:
         memory[readFromMemory()] >>= 1;
         c2 = memory[readFromMemory()] & 0x80;
         memory[readFromMemory()] = memory[readFromMemory()] & 0x7F;
         memory[readFromMemory()] = memory[readFromMemory()] | c * 0x80;
         cycle(5);
         break;
-    case 0x36:
+    case 0x76:
         memory[readFromMemory() + X] >>= 1;
         c2 = memory[readFromMemory() + X] & 0x80;
         memory[readFromMemory() + X] = memory[readFromMemory() + X] & 0x7F;
         memory[readFromMemory() + X] = memory[readFromMemory() + X] | c * 0x80;
         cycle(6);
         break;
-    case 0x2E:
+    case 0x6E:
         ll = readFromMemory();
         hh = readFromMemory();
         memory[hh * 0x100 + ll] >>= 1;
@@ -1519,7 +1626,7 @@ void rotateOneBitRight(){
         memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] | c * 0x80;
         cycle(6);
         break;
-    case 0x3E:
+    case 0x7E:
         ll = readFromMemory();
         hh = readFromMemory();
         memory[addWithCarry(hh * 0x100 + ll, X)] >>= 1;
@@ -1539,4 +1646,211 @@ void rotateOneBitRight(){
     SR[7] = accumulator & c2 * 0x80;
 }
 
+// RTI
+void returnFromIterrupt(){
+    charToStatus(popStack());
+    char ll, hh;
+    hh = popStack();
+    ll = popStack();
+    PC = hh * 0x100 + ll;
+    SR[3] = true;
+}
+
+// RTS
+void returnFromSubroutine(){
+    char ll, hh;
+    hh = popStack();
+    ll = popStack();
+    PC = hh * 0x100 + ll + 1;
+}
+
+// SBC
+void substractMemoryFromAccumulatorWithBorrow(){
+    unsigned char opcode = memory[PC - 1];
+    printf("SBC\n");
+    unsigned char ll, hh;
+    switch (opcode){
+    case 0xE9:
+        accumulator = substractWithBorrow(accumulator, readFromMemory());
+        cycle(2);
+        break;
+    case 0xE5:
+        accumulator = substractWithBorrow(accumulator, memory[readFromMemory()]); 
+        cycle(3);
+        break;
+    case 0xF5:
+        accumulator = substractWithBorrow(accumulator, memory[readFromMemory() + X]);
+        cycle(4);
+        break;
+    case 0xED:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        accumulator = substractWithBorrow(accumulator, memory[hh * 0x100 + ll]); 
+        cycle(4);
+        break;
+    case 0xFD:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        accumulator = substractWithBorrow(accumulator, memory[addWithCarry(hh * 0x100 + ll, X)]); 
+        cycle(4);
+        break;
+    case 0xF9:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        accumulator = substractWithBorrow(accumulator, memory[addWithCarry(hh * 0x100 + ll, Y)]); 
+        cycle(4);
+        break;
+    case 0xE1:
+        ll = readFromMemory();
+        accumulator = substractWithBorrow(accumulator, memory[memory[ll + X] * 0x100 + memory[ll + X + 1]]);
+        cycle(6);
+        break;
+    case 0xF1:
+        accumulator = substractWithBorrow(accumulator, memory[addWithCarry(memory[ll] * 0x100 + memory[ll + 1], Y)]);
+        cycle(5);
+        break;
+    
+    default:
+        break;
+    }
+
+    // Flags
+    SR[0] = accumulator < 0 ? true : false;
+    SR[6] = accumulator == 0 ? true : false;
+}
+
+// SEC
+void setCarryFlag(){
+    prinf("SEC\n");
+    SR[7] = true;
+    cycle(2);
+}
+
+// SED
+void setDecimalFlag(){
+    prinf("SED\n");
+    SR[4] = true;
+    cycle(2);
+}
+
+// SEI
+void setInterruptDisableStatus(){
+    prinf("SED\n");
+    SR[5] = true;
+    cycle(2);
+}
+
+// STX
+void storeIndexXInMemory(){
+    unsigned char opcode = memory[PC - 1];
+    printf("STX\n");
+    unsigned char ll, hh;
+    switch (opcode){
+    case 0x86:
+        memory[readFromMemory()] = X; 
+        cycle(3);
+        break;
+    case 0x96:
+        memory[readFromMemory() + Y] = X; 
+        cycle(4);
+        break;
+    case 0x8E:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        memory[hh * 0x100 + ll] = X;
+        cycle(4);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+// STY
+void storeIndexYInMemory(){
+    unsigned char opcode = memory[PC - 1];
+    printf("STY\n");
+    unsigned char ll, hh;
+    switch (opcode){
+    case 0x84:
+        memory[readFromMemory()] = Y; 
+        cycle(3);
+        break;
+    case 0x94:
+        memory[readFromMemory() + X] = Y; 
+        cycle(4);
+        break;
+    case 0x8C:
+        ll = readFromMemory();
+        hh = readFromMemory();
+        memory[hh * 0x100 + ll] = Y;
+        cycle(4);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+// TAX
+void transferAccumulatorToIndexX(){
+    printf("TAX\n");
+    X = accumulator;
+    cycle(2);
+
+    // Flags
+    SR[0] = X < 0 ? true : false;
+    SR[6] = X == 0 ? true : false;
+}
+
+// TAY
+void transferAccumulatorToIndexY(){
+    printf("TAY\n");
+    Y = accumulator;
+    cycle(2);
+
+    // Flags
+    SR[0] = Y < 0 ? true : false;
+    SR[6] = Y == 0 ? true : false;
+}
+
+// TSX
+void transferStackPointerToIndexX(){
+    printf("TSX\n");
+    X = SP;
+    cycle(2);
+
+    // Flags
+    SR[0] = X < 0 ? true : false;
+    SR[6] = X == 0 ? true : false;
+}
+
+// TXA
+void transferIndexXToAccumulator(){
+    printf("TXA\n");
+    accumulator = X;
+    cycle(2);
+
+    // Flags
+    SR[0] = accumulator < 0 ? true : false;
+    SR[6] = accumulator == 0 ? true : false;
+}
+
+// TXS
+void transferIndexXToStackRegister(){
+    printf("TXS\n");
+    X = SP;
+    cycle(2);
+}
+
+// TYA
+void transferIndexYToAccumulator(){
+    printf("TXA\n");
+    accumulator = Y;
+    cycle(2);
+
+    // Flags
+    SR[0] = accumulator < 0 ? true : false;
+    SR[6] = accumulator == 0 ? true : false;
+}
 
