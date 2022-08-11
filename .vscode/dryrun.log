@@ -1,0 +1,5 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/guillermo/C/6502Emu/6502Emu'
+gcc 6502Emu.c -o 6502Emu.out
+make: Leaving directory '/home/guillermo/C/6502Emu/6502Emu'
+ 

@@ -82,15 +82,15 @@ void transferIndexXToAccumulator();
 void transferIndexXToStackRegister();
 void transferIndexYToAccumulator();
 
-char * memory;
+unsigned char * memory;
 int cpuClock = 0;
 float frecuency = 1000000; //1 MHz
 
 // Registers
 unsigned short PC = 0;
 char accumulator = 0;
-char X = 0;
-char Y = 0;
+unsigned char X = 0;
+unsigned char Y = 0;
 //             Neg  Overflow  -    Break Decimal  Int   Zero   Carry
 bool SR[8] = {false, false, false, false, false, false, false, false};
 
@@ -104,19 +104,22 @@ bool stopSignal = false;
 bool useFrecuency = true;
 
 int main(){
-    initializeInstructionSet(instructionSet);
-    allocateMemory(&memory, 65535);
-    loadSystemVectors();
-    loadFileToMemory("ProgramFile.bin", 0x800);
-    startup();
-    run();
-    printStatus();
-
-    //printf("%x", EOF);
-
-    // for(int i = 0x8000; i <= 0x8005; i++){
+    // initializeInstructionSet(instructionSet);
+    // allocateMemory(&memory, 65535);
+    // loadSystemVectors();
+    // loadFileToMemory("ProgramFile.bin", 0x800);
+    // startup();
+    // run();
+    // printStatus();
+    // for(int i = 0x200; i <= 0x205; i++){
     //     printf(" %.2x", memory[i]);
     // }
+    
+    char a = 0x03;
+    printf("%x\n", a);
+    a >>= 2;
+    printf("%x\n", a);
+
     printf("\n");
 }
 
@@ -125,7 +128,8 @@ void run(){
     while(!stopSignal){
         unsigned char instruction = (unsigned char)readFromMemory();
         executeInstruction(instructionSet, instruction);
-        //printStatus();
+        
+        printStatus();
         // for(int i = 0x8000; i <= 0x8005; i++){
         //     printf(" %.2x", memory[i]);
         // }
@@ -144,14 +148,9 @@ void loadFileToMemory(char * fileName, unsigned short offset){
         fseek(file, 0, SEEK_SET);
         for(int i = 0; i < fileSize; i++){
             c = fgetc(file);
-            printf("%x: %.2x\n", pos, c);
+            //printf("%x: %.2x\n", pos, c);
             memory[pos++] = (char) c;
         }
-
-        // while((c = fgetc(file)) != EOF){
-        //     printf("%x: %.2x\n", pos, c);
-        //     memory[pos++] = (char) c;
-        // }
         fclose(file);
     }else{
         printf("ERROR\n");
@@ -208,7 +207,6 @@ char addWithCarry(char a, char b){
 
     unsigned char ua = (unsigned char)a;
     unsigned char ub = (unsigned char)b;
-    printf("%x + %x = %x\n", ua, ub, ua+ub);
     if ((unsigned char)(ua + ub) < ua || (unsigned char)(ua + ub) < ub){
         SR[7] = true;
     }else{
@@ -328,7 +326,7 @@ void initializeInstructionSet(void (* instructionSet[])()){
     instructionSet[0x3E] = rotateOneBitLeft;
 
     // BCC
-    instructionSet[90] = branchOnCarryClear;
+    instructionSet[0x90] = branchOnCarryClear;
 
     // BCS
     instructionSet[0xB0] = branchOnCarrySet;
@@ -536,6 +534,7 @@ void initializeInstructionSet(void (* instructionSet[])()){
 }
 
 void executeInstruction(void (* instructionSet[])(), unsigned char instruction){
+    //printf("%x\n", instruction);
     instructionSet[instruction](); 
 }
 
@@ -1474,6 +1473,7 @@ void shiftOneBitRight(){
         memory[hh * 0x100 + ll] <<= 1;
         c2 = memory[hh * 0x100 + ll] & 0x80;
         memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] & 0x7F;
+        printf("%x\n", memory[hh * 0x100 + ll]);
         cycle(6);
         break;
     case 0x5E:
@@ -1599,6 +1599,7 @@ void rotateOneBitRight(){
     case 0x6A:
         accumulator >>= 1;
         c2 = accumulator & 0x80;
+        printf("%x", accumulator);
         accumulator = accumulator & 0x7F;
         accumulator = accumulator | c * 0x80;
         cycle(2);
@@ -1721,21 +1722,21 @@ void substractMemoryFromAccumulatorWithBorrow(){
 
 // SEC
 void setCarryFlag(){
-    prinf("SEC\n");
+    printf("SEC\n");
     SR[7] = true;
     cycle(2);
 }
 
 // SED
 void setDecimalFlag(){
-    prinf("SED\n");
+    printf("SED\n");
     SR[4] = true;
     cycle(2);
 }
 
 // SEI
 void setInterruptDisableStatus(){
-    prinf("SED\n");
+    printf("SED\n");
     SR[5] = true;
     cycle(2);
 }
