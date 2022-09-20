@@ -1009,7 +1009,6 @@ void branchOnResultNotZero(){
     printf("BNE\n");
     char offset = readFromMemory();
     if(!SR[6]){
-        printf("WOLOLO\n");
         PC += offset;
         cycle(1);
     }
