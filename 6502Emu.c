@@ -24,7 +24,7 @@ char addWithCarry(char a, char b);
 void addWithCarryIns();
 void andMemoryWithAccumulator();
 void rotateOneBitLeft();
-void pushStack(char data);
+void pushStack(unsigned char data);
 char popStack();
 void loadSystemVectors();
 void startup();
@@ -158,6 +158,16 @@ void loadSystemVectors(){
 
 void startup(){
     printf("System startup\n");
+
+    SR[0] = false;
+    SR[1] = false;
+    SR[2] = true;
+    SR[3] = true;
+    SR[4] = false;
+    SR[5] = true;
+    SR[6] = true;
+    SR[7] = false;
+
     cycle(7);
     PC = (memory[0xFFFD] * 0x100 + memory[0xFFFC]);
     cycle(1);
@@ -179,7 +189,8 @@ void printStatus(){
     printf("Clock: %d Frecuency: %f\n", cpuClock, frecuency);
     printf("=========== REGISTERS ==========\n");
     printf("PC: %x Acc: %02hhx X: %02hhx Y: %02hhx SP: %02hhx\n", PC, accumulator, X, Y, SP);
-    printf("Flags: N: %d V: %d B: %d D: %d I: %d Z: %d C: %d\n\n", SR[0], SR[1], SR[3], SR[4], SR[5], SR[6], SR[7]);
+    printf("Flags: N: %d V: %d B: %d D: %d I: %d Z: %d C: %d\n", SR[0], SR[1], SR[3], SR[4], SR[5], SR[6], SR[7]);
+    printf("Current Instruction: %02hhx\n\n", memory[PC]);
 }
 
 char addWithCarry(char a, char b){
@@ -225,7 +236,7 @@ char substractWithBorrow(char a, char b){
     return a - b - c;
 }
 
-void pushStack(char data){
+void pushStack(unsigned char data){
     SP--;
     memory[SP + 0x100] = data;
 }
@@ -906,10 +917,9 @@ void branchOnResultZero(){
 
 // BIT
 void testBitsInMemoryWithAccumulator(){
-    printf("BIT\n");
     unsigned char opcode = memory[PC - 1];
     printf("BIT\n");
-    char ll, hh, data;
+    unsigned char ll, hh, data;
     switch (opcode){
     case 0x24:
         data = memory[readFromMemory() + X];
@@ -1317,7 +1327,7 @@ void incrementIndexYByOne(){
 // JMP
 void jumpToNewLocation(){
     unsigned char opcode = memory[PC - 1];
-    printf("INC\n");
+    printf("JMP\n");
     unsigned char ll, hh;
     switch (opcode){
     case 0x4C:
@@ -1329,7 +1339,7 @@ void jumpToNewLocation(){
     case 0x6C:
         ll = readFromMemory();
         hh = readFromMemory();
-        PC = memory[hh * 0x100 + ll] * 0x100 + memory[hh * 0x100 + ll + 1];
+        PC = memory[hh * 0x100 + ll + 1] * 0x100 + memory[hh * 0x100 + ll];
         cycle(5);
         break;
     
@@ -1343,7 +1353,7 @@ void jumpToNewLocationSavingReturnAdress(){
     printf("JSR\n");
     unsigned char ll, hh;
     ll = (unsigned char)(PC & 0x00FF);
-    hh = (unsigned char)(PC & 0xFF00);
+    hh = (unsigned char)((PC & 0xFF00) / 0x100);
     pushStack(hh);
     pushStack(ll + 2);
     ll = readFromMemory();
@@ -1646,10 +1656,11 @@ void returnFromIterrupt(){
 
 // RTS
 void returnFromSubroutine(){
+    printf("RTS\n");
     char ll, hh;
-    hh = popStack();
     ll = popStack();
-    PC = hh * 0x100 + ll + 1;
+    hh = popStack();
+    PC = hh * 0x100 + ll;
 }
 
 // SBC
