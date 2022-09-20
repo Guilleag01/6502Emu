@@ -241,7 +241,7 @@ unsigned char substractWithBorrow(unsigned char a, unsigned char b){
         SR[1] = false;
     }
 
-    if ((usa - usb - usc) > usa || (usa - usb - usc) > usb){
+    if ((char)(usa - usb - usc) > 0){
         SR[7] = true;
     }else{
         SR[7] = false;
