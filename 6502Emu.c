@@ -1768,7 +1768,7 @@ void storeIndexXInMemory(){
 // STY
 void storeIndexYInMemory(){
     unsigned char opcode = memory[PC - 1];
-    //printf("STY %x\n", opcode);
+    printf("STY\n");
     unsigned char ll, hh;
     switch (opcode){
     case 0x84:
