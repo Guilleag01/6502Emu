@@ -1,4 +1,4 @@
-// THE BIBLE: https://masswerk.at/6502/6502_instruction_set.html#ASL
+// THE BIBLE: https://masswerk.at/vsco de break point when variable 6502/6502_instruction_set.html#ASL
 // GOD: https://www.youtube.com/c/BenEater
 
 #include <stdio.h>
@@ -82,10 +82,10 @@ void transferIndexXToAccumulator();
 void transferIndexXToStackRegister();
 void transferIndexYToAccumulator();
 void isc();
-
+ // C0
 unsigned char * memory;
 int cpuClock = 0;
-float frecuency = 100; //1 MHz
+float frecuency = 1000000; //1 MHz
 
 // Registers
 unsigned short PC = 0;
