@@ -103,7 +103,7 @@ void (* instructionSet[256])();
 bool stopSignal = false;
 
 bool useFrecuency = true;
-
+ 
 int main(){
     // initializeInstructionSet(instructionSet);
     // allocateMemory(&memory, 65535);
