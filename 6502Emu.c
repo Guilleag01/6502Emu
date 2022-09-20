@@ -9,7 +9,7 @@
 
 #define TEST printf("TEST\n")
 
-void allocateMemory(char ** memory, int size);
+void allocateMemory(unsigned char ** memory, int size);
 void executeInstruction(void (* instructionSet[])(), unsigned char instruction  );
 void haltCPU();
 void cycle(unsigned int cycle);
@@ -84,7 +84,7 @@ void transferIndexYToAccumulator();
 
 unsigned char * memory;
 int cpuClock = 0;
-float frecuency = 1000000; //1 MHz
+float frecuency = 100; //1 MHz
 
 // Registers
 unsigned short PC = 0;
@@ -104,23 +104,13 @@ bool stopSignal = false;
 bool useFrecuency = true;
 
 int main(){
-    // initializeInstructionSet(instructionSet);
-    // allocateMemory(&memory, 65535);
-    // loadSystemVectors();
-    // loadFileToMemory("ProgramFile.bin", 0x800);
-    // startup();
-    // run();
-    // printStatus();
-    // for(int i = 0x200; i <= 0x205; i++){
-    //     printf(" %.2x", memory[i]);
-    // }
-    
-    char a = 0x03;
-    printf("%x\n", a);
-    a >>= 2;
-    printf("%x\n", a);
-
-    printf("\n");
+    initializeInstructionSet(instructionSet);
+    allocateMemory(&memory, 65535);
+    loadSystemVectors();
+    loadFileToMemory("APPLE2.ROM", 0xB000);
+    startup();
+    run();
+    printStatus();
 }
 
 void run(){
@@ -130,10 +120,6 @@ void run(){
         executeInstruction(instructionSet, instruction);
         
         printStatus();
-        // for(int i = 0x8000; i <= 0x8005; i++){
-        //     printf(" %.2x", memory[i]);
-        // }
-        //printf("\n\n");
     }
 }
 
@@ -150,6 +136,7 @@ void loadFileToMemory(char * fileName, unsigned short offset){
             c = fgetc(file);
             //printf("%x: %.2x\n", pos, c);
             memory[pos++] = (char) c;
+            // printf("%x\n", pos);
         }
         fclose(file);
     }else{
@@ -157,15 +144,15 @@ void loadFileToMemory(char * fileName, unsigned short offset){
     }
 }
 
-void allocateMemory(char ** memory, int size){
+void allocateMemory(unsigned char ** memory, int size){
     *memory = (char *)malloc(size);
 }
 
 void loadSystemVectors(){
     // NMI (Non-Maskable Interrupt)
     // RES (Reset)
-    memory[0xFFFC] = 0x00;
-    memory[0xFFFD] = 0x08;
+    // memory[0xFFFC] = 0x00;
+    // memory[0xFFFD] = 0x08;
     // IRQ (Interrupt Request)
 }
 
@@ -183,7 +170,7 @@ char readFromMemory(){
 void cycle(unsigned int cycle){
     cpuClock += cycle;
     if(useFrecuency){
-        sleep(cycle/frecuency);
+        usleep((int)((cycle/frecuency)*1000000));
     }
 }
 
@@ -191,7 +178,7 @@ void printStatus(){
     printf("\n======== GENERAL STATUS ========\n");
     printf("Clock: %d Frecuency: %f\n", cpuClock, frecuency);
     printf("=========== REGISTERS ==========\n");
-    printf("PC: %x Acc: %x X: %x Y: %x SP: %x\n", PC, accumulator, X, Y, SP);
+    printf("PC: %x Acc: %02hhx X: %02hhx Y: %02hhx SP: %02hhx\n", PC, accumulator, X, Y, SP);
     printf("Flags: N: %d V: %d B: %d D: %d I: %d Z: %d C: %d\n\n", SR[0], SR[1], SR[3], SR[4], SR[5], SR[6], SR[7]);
 }
 
@@ -218,7 +205,7 @@ char addWithCarry(char a, char b){
 
 char substractWithBorrow(char a, char b){
     bool c = SR[7];
-    if(a > 0 && b > 0 && a - b - c < 0){
+    if(a > 0 && b > 0 && a - b - c < 0){PC = 
         SR[1] = true;
     }else if(a < 0 && b < 0 && a - b - c > 0){
         SR[1] = true;
@@ -605,8 +592,8 @@ void loadAcumulatorWithMemory(){
     }    
 
     // Flags
-    SR[0] = accumulator < 0 ? true : false;
-    SR[6] = accumulator == 0 ? true : false;
+    SR[0] = accumulator < 0;
+    SR[6] = accumulator == 0;
 }
 
 // STA
@@ -714,8 +701,8 @@ void addWithCarryIns(){
     }
 
     // Flags
-    SR[0] = accumulator < 0 ? true : false;
-    SR[6] = accumulator == 0 ? true : false;
+    SR[0] = accumulator < 0;
+    SR[6] = accumulator == 0;
 }
 
 // AND
@@ -769,8 +756,8 @@ void andMemoryWithAccumulator(){
     }
 
     // Flags
-    SR[0] = accumulator < 0 ? true : false;
-    SR[6] = accumulator == 0 ? true : false;
+    SR[0] = accumulator < 0;
+    SR[6] = accumulator == 0;
 }
 
 // ROL
@@ -782,41 +769,41 @@ void rotateOneBitLeft(){
     bool c2 = false;
     switch (opcode){
     case 0x2A:
+        c2 = accumulator & 0x80;
         accumulator <<= 1;
-        c2 = accumulator & 0x01;
-        accumulator = accumulator & 0xfe;
-        accumulator = accumulator | c;
+        // accumulator = accumulator & 0xfe;
+        // accumulator = accumulator | c;
         cycle(2);
         break;
     case 0x26:
+        c2 = memory[readFromMemory()] & 0x80;
         memory[readFromMemory()] <<= 1;
-        c2 = memory[readFromMemory()] & 0x01;
-        memory[readFromMemory()] = memory[readFromMemory()] & 0xfe;
+        // memory[readFromMemory()] = memory[readFromMemory()] & 0xfe;
         memory[readFromMemory()] = memory[readFromMemory()] | c;
         cycle(5);
         break;
     case 0x36:
+        c2 = memory[readFromMemory() + X] & 0x80;
         memory[readFromMemory() + X] <<= 1;
-        c2 = memory[readFromMemory() + X] & 0x01;
-        memory[readFromMemory() + X] = memory[readFromMemory() + X] & 0xfe;
+        // memory[readFromMemory() + X] = memory[readFromMemory() + X] & 0xfe;
         memory[readFromMemory() + X] = memory[readFromMemory() + X] | c;
         cycle(6);
         break;
     case 0x2E:
         ll = readFromMemory();
         hh = readFromMemory();
+        c2 = memory[hh * 0x100 + ll] & 0x80;
         memory[hh * 0x100 + ll] <<= 1;
-        c2 = memory[hh * 0x100 + ll] & 0x01;
-        memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] & 0xfe;
+        // memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] & 0xfe;
         memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] | c;
         cycle(6);
         break;
     case 0x3E:
         ll = readFromMemory();
         hh = readFromMemory();
+        c2 = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x80;
         memory[addWithCarry(hh * 0x100 + ll, X)] <<= 1;
-        c2 = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x01;
-        memory[addWithCarry(hh * 0x100 + ll, X)] = memory[addWithCarry(hh * 0x100 + ll, X)] & 0xfe;
+        // memory[addWithCarry(hh * 0x100 + ll, X)] = memory[addWithCarry(hh * 0x100 + ll, X)] & 0xfe;
         memory[addWithCarry(hh * 0x100 + ll, X)] = memory[addWithCarry(hh * 0x100 + ll, X)] | c;
         cycle(7);
         break;
@@ -826,9 +813,9 @@ void rotateOneBitLeft(){
     }
 
     // Flags
-    SR[0] = accumulator < 0 ? true : false;
-    SR[6] = accumulator == 0 ? true : false;
-    SR[7] = accumulator & c2;
+    SR[0] = accumulator < 0;
+    SR[6] = accumulator == 0;
+    SR[7] = c2; //accumulator & c2;
 }
 
 // ASL
@@ -840,37 +827,37 @@ void shiftLeftOneBit(){
     bool c2 = false;
     switch (opcode){
     case 0x2A:
+        c2 = accumulator & 0x80;
         accumulator <<= 1;
-        c2 = accumulator & 0x01;
-        accumulator = accumulator & 0xfe;
+        //accumulator = accumulator & 0xfe;
         cycle(2);
         break;
     case 0x26:
+        c2 = memory[readFromMemory()] & 0x80;
         memory[readFromMemory()] <<= 1;
-        c2 = memory[readFromMemory()] & 0x01;
-        memory[readFromMemory()] = memory[readFromMemory()] & 0xfe;
+        //memory[readFromMemory()] = memory[readFromMemory()] & 0xfe;
         cycle(5);
         break;
     case 0x36:
         memory[readFromMemory() + X] <<= 1;
-        c2 = memory[readFromMemory() + X] & 0x01;
-        memory[readFromMemory() + X] = memory[readFromMemory() + X] & 0xfe;
+        c2 = memory[readFromMemory() + X] & 0x80;
+        //memory[readFromMemory() + X] = memory[readFromMemory() + X] & 0xfe;
         cycle(6);
         break;
     case 0x2E:
         ll = readFromMemory();
         hh = readFromMemory();
+        c2 = memory[hh * 0x100 + ll] & 0x80;
         memory[hh * 0x100 + ll] <<= 1;
-        c2 = memory[hh * 0x100 + ll] & 0x01;
-        memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] & 0xfe;
+        //memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] & 0xfe;
         cycle(6);
         break;
     case 0x3E:
         ll = readFromMemory();
         hh = readFromMemory();
+        c2 = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x80;
         memory[addWithCarry(hh * 0x100 + ll, X)] <<= 1;
-        c2 = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x01;
-        memory[addWithCarry(hh * 0x100 + ll, X)] = memory[addWithCarry(hh * 0x100 + ll, X)] & 0xfe;
+        //memory[addWithCarry(hh * 0x100 + ll, X)] = memory[addWithCarry(hh * 0x100 + ll, X)] & 0xfe;
         cycle(7);
         break;
     
@@ -879,9 +866,9 @@ void shiftLeftOneBit(){
     }
 
     // Flags
-    SR[0] = accumulator < 0 ? true : false;
-    SR[6] = accumulator == 0 ? true : false;
-    SR[7] = accumulator & c2;
+    SR[0] = accumulator < 0;
+    SR[6] = accumulator == 0;
+    SR[7] = c2;
 }
 
 // BCC
@@ -1092,8 +1079,8 @@ void compareMemoryWithAccumulator(){
     }
 
     // Flags
-    SR[0] = result < 0 ? true : false;
-    SR[6] = result == 0 ? true : false;
+    SR[0] = result < 0;
+    SR[6] = result == 0;
 }
 
 // CPX
@@ -1123,8 +1110,8 @@ void compareMemoryAndIndexX(){
     }
 
     // Flags
-    SR[0] = result < 0 ? true : false;
-    SR[6] = result == 0 ? true : false;    
+    SR[0] = result < 0;
+    SR[6] = result == 0;    
 }
 
 // CPY
@@ -1154,8 +1141,8 @@ void compareMemoryAndIndexY(){
     }
 
     // Flags
-    SR[0] = result < 0 ? true : false;
-    SR[6] = result == 0 ? true : false;    
+    SR[0] = result < 0;
+    SR[6] = result == 0;    
 }
 
 // DEC
@@ -1191,8 +1178,8 @@ void decrementMemoryByOne(){
     }
 
     // Flags
-    SR[0] = result < 0 ? true : false;
-    SR[6] = result == 0 ? true : false;
+    SR[0] = result < 0;
+    SR[6] = result == 0;
 }
 
 // DEX
@@ -1201,8 +1188,8 @@ void decrementIndexXByOne(){
     X--;
 
     // Flags
-    SR[0] = X < 0 ? true : false;
-    SR[6] = X == 0 ? true : false;
+    SR[0] = X < 0;
+    SR[6] = X == 0;
 }
 
 // DEY
@@ -1211,8 +1198,8 @@ void decrementIndexYByOne(){
     Y--;
 
     // Flags
-    SR[0] = Y < 0 ? true : false;
-    SR[6] = Y == 0 ? true : false;
+    SR[0] = Y < 0;
+    SR[6] = Y == 0;
 }
 
 // EOR
@@ -1266,8 +1253,8 @@ void exclusiveOrWithAccumulator(){
     }
 
     // Flags
-    SR[0] = accumulator < 0 ? true : false;
-    SR[6] = accumulator == 0 ? true : false;
+    SR[0] = accumulator < 0;
+    SR[6] = accumulator == 0;
 }
 
 // INC
@@ -1303,8 +1290,8 @@ void incrementMemoryByOne(){
     }
 
     // Flags
-    SR[0] = result < 0 ? true : false;
-    SR[6] = result == 0 ? true : false;
+    SR[0] = result < 0;
+    SR[6] = result == 0;
 }
 
 // INX
@@ -1313,8 +1300,8 @@ void incrementIndexXByOne(){
     X++;
 
     // Flags
-    SR[0] = X < 0 ? true : false;
-    SR[6] = X == 0 ? true : false;
+    SR[0] = X < 0;
+    SR[6] = X == 0;
 }
 
 // INY
@@ -1323,8 +1310,8 @@ void incrementIndexYByOne(){
     Y++;
 
     // Flags
-    SR[0] = Y < 0 ? true : false;
-    SR[6] = Y == 0 ? true : false;
+    SR[0] = Y < 0;
+    SR[6] = Y == 0;
 }
 
 // JMP
@@ -1355,8 +1342,8 @@ void jumpToNewLocation(){
 void jumpToNewLocationSavingReturnAdress(){
     printf("JSR\n");
     unsigned char ll, hh;
-    ll = (char)(PC & 0x00FF);
-    hh = (char)(PC & 0xFF00);
+    ll = (unsigned char)(PC & 0x00FF);
+    hh = (unsigned char)(PC & 0xFF00);
     pushStack(hh);
     pushStack(ll + 2);
     ll = readFromMemory();
@@ -1399,8 +1386,8 @@ void loadIndexXWithMemory(){
         break;
     }
 
-    SR[0] = X < 0 ? true : false;
-    SR[6] = X == 0 ? true : false;
+    SR[0] = X < 0;
+    SR[6] = X == 0;
 }
 
 // LDY
@@ -1437,8 +1424,8 @@ void loadIndexYWithMemory(){
         break;
     }
 
-    SR[0] = Y < 0 ? true : false;
-    SR[6] = Y == 0 ? true : false;
+    SR[0] = Y < 0;
+    SR[6] = Y == 0;
 }
 
 // LSR
@@ -1450,28 +1437,28 @@ void shiftOneBitRight(){
     bool c2 = false;
     switch (opcode){
     case 0x4A:
+        c2 = accumulator & 0x01;
         accumulator >>= 1;
-        c2 = accumulator & 0x80;
-        accumulator = accumulator & 0x7F;
+        //accumulator = accumulator & 0x7F;
         cycle(2);
         break;
     case 0x46:
+        c2 = memory[readFromMemory()] & 0x01;
         memory[readFromMemory()] >>= 1;
-        c2 = memory[readFromMemory()] & 0x80;
-        memory[readFromMemory()] = memory[readFromMemory()] & 0x7F;
+        //memory[readFromMemory()] = memory[readFromMemory()] & 0x7F;
         cycle(5);
         break;
     case 0x56:
+        c2 = memory[readFromMemory() + X] & 0x01;
         memory[readFromMemory() + X] >>= 1;
-        c2 = memory[readFromMemory() + X] & 0x80;
-        memory[readFromMemory() + X] = memory[readFromMemory() + X] & 0x7F;
+        //memory[readFromMemory() + X] = memory[readFromMemory() + X] & 0x7F;
         cycle(6);
         break;
     case 0x4E:
         ll = readFromMemory();
         hh = readFromMemory();
-        memory[hh * 0x100 + ll] <<= 1;
-        c2 = memory[hh * 0x100 + ll] & 0x80;
+        c2 = memory[hh * 0x100 + ll] & 0x01;
+        memory[hh * 0x100 + ll] >>= 1;
         memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] & 0x7F;
         printf("%x\n", memory[hh * 0x100 + ll]);
         cycle(6);
@@ -1479,8 +1466,8 @@ void shiftOneBitRight(){
     case 0x5E:
         ll = readFromMemory();
         hh = readFromMemory();
-        memory[addWithCarry(hh * 0x100 + ll, X)] <<= 1;
-        c2 = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x80;
+        c2 = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x01;
+        memory[addWithCarry(hh * 0x100 + ll, X)] >>= 1;
         memory[addWithCarry(hh * 0x100 + ll, X)] = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x7F;
         cycle(7);
         break;
@@ -1491,7 +1478,7 @@ void shiftOneBitRight(){
 
     // Flags
     SR[0] = false;
-    SR[6] = accumulator == 0 ? true : false;
+    SR[6] = accumulator == 0;
     SR[7] = c2;
 }
 
@@ -1552,8 +1539,8 @@ void orMemoryWithAccumulator(){
     }
 
     // Flags
-    SR[0] = accumulator < 0 ? true : false;
-    SR[6] = accumulator == 0 ? true : false;
+    SR[0] = accumulator < 0;
+    SR[6] = accumulator == 0;
 }
 
 // PHA
@@ -1577,8 +1564,8 @@ void pullAccumulatorOffStack(){
     cycle(3);
 
     // Flags
-    SR[0] = accumulator < 0 ? true : false;
-    SR[6] = accumulator == 0 ? true : false;
+    SR[0] = accumulator < 0;
+    SR[6] = accumulator == 0;
 }
 
 // PLP
@@ -1597,42 +1584,42 @@ void rotateOneBitRight(){
     bool c2 = false;
     switch (opcode){
     case 0x6A:
+        c2 = accumulator & 0x01;
         accumulator >>= 1;
-        c2 = accumulator & 0x80;
-        printf("%x", accumulator);
-        accumulator = accumulator & 0x7F;
+        //printf("%x", accumulator);
+        //accumulator = accumulator & 0x7F;
         accumulator = accumulator | c * 0x80;
         cycle(2);
         break;
     case 0x66:
+        c2 = memory[readFromMemory()] & 0x01;
         memory[readFromMemory()] >>= 1;
-        c2 = memory[readFromMemory()] & 0x80;
-        memory[readFromMemory()] = memory[readFromMemory()] & 0x7F;
+        // memory[readFromMemory()] = memory[readFromMemory()] & 0x7F;
         memory[readFromMemory()] = memory[readFromMemory()] | c * 0x80;
         cycle(5);
         break;
     case 0x76:
+        c2 = memory[readFromMemory() + X] & 0x01;
         memory[readFromMemory() + X] >>= 1;
-        c2 = memory[readFromMemory() + X] & 0x80;
-        memory[readFromMemory() + X] = memory[readFromMemory() + X] & 0x7F;
+        // memory[readFromMemory() + X] = memory[readFromMemory() + X] & 0x7F;
         memory[readFromMemory() + X] = memory[readFromMemory() + X] | c * 0x80;
         cycle(6);
         break;
     case 0x6E:
         ll = readFromMemory();
         hh = readFromMemory();
+        c2 = memory[hh * 0x100 + ll] & 0x01;
         memory[hh * 0x100 + ll] >>= 1;
-        c2 = memory[hh * 0x100 + ll] & 0x80;
-        memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] & 0x7F;
+        // memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] & 0x7F;
         memory[hh * 0x100 + ll] = memory[hh * 0x100 + ll] | c * 0x80;
         cycle(6);
         break;
     case 0x7E:
         ll = readFromMemory();
         hh = readFromMemory();
+        c2 = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x01;
         memory[addWithCarry(hh * 0x100 + ll, X)] >>= 1;
-        c2 = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x80;
-        memory[addWithCarry(hh * 0x100 + ll, X)] = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x7F;
+        // memory[addWithCarry(hh * 0x100 + ll, X)] = memory[addWithCarry(hh * 0x100 + ll, X)] & 0x7F;
         memory[addWithCarry(hh * 0x100 + ll, X)] = memory[addWithCarry(hh * 0x100 + ll, X)] | c * 0x80;
         cycle(7);
         break;
@@ -1642,9 +1629,9 @@ void rotateOneBitRight(){
     }
 
     // Flags
-    SR[0] = accumulator < 0 ? true : false;
-    SR[6] = accumulator == 0 ? true : false;
-    SR[7] = accumulator & c2 * 0x80;
+    SR[0] = accumulator < 0;
+    SR[6] = accumulator == 0;
+    SR[7] = c2; //accumulator & c2 * 0x80;
 }
 
 // RTI
@@ -1716,8 +1703,8 @@ void substractMemoryFromAccumulatorWithBorrow(){
     }
 
     // Flags
-    SR[0] = accumulator < 0 ? true : false;
-    SR[6] = accumulator == 0 ? true : false;
+    SR[0] = accumulator < 0;
+    SR[6] = accumulator == 0;
 }
 
 // SEC
@@ -1770,7 +1757,7 @@ void storeIndexXInMemory(){
 // STY
 void storeIndexYInMemory(){
     unsigned char opcode = memory[PC - 1];
-    printf("STY\n");
+    //printf("STY %x\n", opcode);
     unsigned char ll, hh;
     switch (opcode){
     case 0x84:
@@ -1800,8 +1787,8 @@ void transferAccumulatorToIndexX(){
     cycle(2);
 
     // Flags
-    SR[0] = X < 0 ? true : false;
-    SR[6] = X == 0 ? true : false;
+    SR[0] = X < 0;
+    SR[6] = X == 0;
 }
 
 // TAY
@@ -1811,8 +1798,8 @@ void transferAccumulatorToIndexY(){
     cycle(2);
 
     // Flags
-    SR[0] = Y < 0 ? true : false;
-    SR[6] = Y == 0 ? true : false;
+    SR[0] = Y < 0;
+    SR[6] = Y == 0;
 }
 
 // TSX
@@ -1822,8 +1809,8 @@ void transferStackPointerToIndexX(){
     cycle(2);
 
     // Flags
-    SR[0] = X < 0 ? true : false;
-    SR[6] = X == 0 ? true : false;
+    SR[0] = X < 0;
+    SR[6] = X == 0;
 }
 
 // TXA
@@ -1833,8 +1820,8 @@ void transferIndexXToAccumulator(){
     cycle(2);
 
     // Flags
-    SR[0] = accumulator < 0 ? true : false;
-    SR[6] = accumulator == 0 ? true : false;
+    SR[0] = accumulator < 0;
+    SR[6] = accumulator == 0;
 }
 
 // TXS
@@ -1851,7 +1838,7 @@ void transferIndexYToAccumulator(){
     cycle(2);
 
     // Flags
-    SR[0] = accumulator < 0 ? true : false;
-    SR[6] = accumulator == 0 ? true : false;
+    SR[0] = accumulator < 0;
+    SR[6] = accumulator == 0;
 }
 

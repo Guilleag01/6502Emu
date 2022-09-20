@@ -1,0 +1,2235 @@
+;==============================================================
+; Apple II Plus Equates [Edited] by James P. Davis        [Me!]
+;==============================================================
+
+*SYNOPSIS Symbols for the Apple II Plus.  (All UpperCase.)
+
+;==============================================================
+; Notes: I made this verbose for future newbies
+;        & amateur 6502 programmers.
+; -------------------------------------------------------------
+; All symbols, labels, & comments, are adapted from works by
+; Apple Computer Inc., David T Craig, William F. Luebbert,
+; Jim Sather, Bob Sander-Cederlof, Michael Pohoreski,
+; Andy McFadden, (& most likely) many more other persons, and
+; by me, the Editor of this document.  Actually, I've changed
+; a lot of them!
+; -------------------------------------------------------------
+; Some Applesoft comments are by David T Craig, originally;
+; some are by Bob Sander-Cederlof; most of those have been
+; edited by me; others are just by me (for my verbose
+; analysis)!  Again, I've changed a lot of them!
+;==============================================================
+; Sources:
+; -------------------------------------------------------------
+; 1. "Apple II Memory Equates for Assembly Programmers" by me.
+; 2. Various "DIS65" & "SYM65" files & disassembly listings by
+;    Andy McFadden (faddenSoft).
+; 3. Various AppleWin "SYM" files by Michael Pohoreski &
+;    Tom Charlesworth.
+; 4. "Understanding the Apple II" and
+;    "Understanding the Apple IIe" (both) by Jim Sather.
+; 5. "What's Where in the Apple" by William F. Luebbert.
+; 6. "S-C DocuMentor: Applesoft" by Bob Sander-Cederlof.
+; 7. "AppleSoft BASIC Source (DTCA2DOC-007)" by David T Craig.
+; 8. "AppleSoft", Rev. 4/27/1984, Assembly Listing from
+;    diskette accompanying "Call-A.P.P.L.E. In Depth #1:
+;    All About Applesoft" (IIRC).
+; 9. "Apple II Monitors Peeled" (c) 1981 by Apple Computer Inc.
+; A. Other Apple II ROMs {Known FTP Sources}:
+; ftp://ftp.apple.asimov.net/pub/apple_II/emulators/rom_images/
+; or ftp://public.asimov.net/pub/apple_II/emulators/rom_images/
+;==============================================================
+; Constant  = $nnnn ;Constant Assignments look like this
+; Constant    = $nn ;Assignments like this are NOT ZP Equates
+;--------------------------------------------------------------
+; Label     @ $nnnn ;Label Assignments look like this
+; Label     @   $nn ;Assignments like this are ZP Equates
+;==============================================================
+
+
+;==============================================================
+; Contants Equate Table:
+;==============================================================
+; 
+ERR_NOFOR     = $00 ;"?Next Without For" Error Index
+CTRLCL        = $03 ;Low ASCII Ctrl+C Character
+BELL_L        = $07 ;Low ASCII Ctrl-G: Sound Bell Character
+BSL           = $08 ;Low ASCII Ctrl-H: Backspace
+LFL           = $0A ;Low ASCII Ctrl-J: Line Feed
+RTNL          = $0D ;Low ASCII Ctrl-M: Carriage Return
+ERR_SYNTAX    = $10 ;"?Syntax" Error Index
+ERR_NOGOSUB   = $16 ;"?Return Without Gosub" Error Index
+CTRLXL        = $18 ;Low ASCII Cancel Character (Ctrl+X)
+ESCL          = $1B ;Low ASCII Escape Character (Ctrl+[)
+BIT_ZP        = $24 ;BIT OpCode for a Zero-Page Address
+ERR_NODATA    = $2A ;"?Out Of Data" Error Index
+BIT_ABS       = $2C ;BIT OpCode for an Absolute Address
+SIZE          = $30 ;Maximum Size of Lo-Res Screen (48 x 48)
+ERR_ILLQTY    = $35 ;"?Illegal Quantity" Error Index
+P8_ALNTRPT    = $40 ;Originally: P8.ALLOC.INTERRUPT
+P8_DALNTRPT   = $41 ;Originally: P8.DEALLOC.INTERRUPT
+ERR_OVERFLOW  = $45 ;"?Overflow" Error Index
+P_OR          = $46 ;Math Operator: "OR"  Precedence Code
+ERR_MEMFULL   = $4D ;"?Out Of Memory" Error Index
+P_AND         = $50 ;Math Operator: "AND" Precedence Code
+ERR_UNDEFSTAT = $5A ;"?Undef'd Statement" Error Index
+P_REL         = $64 ;Math Operator: "REL" Precedence Code
+P8_QUIT       = $65 ;Originally: P8.QUIT
+ERR_BADSUBS   = $6B ;"?Bad Subscript" Error Index
+ERR_REDIMD    = $78 ;"?Redim'd Array" Error Index
+P_ADD         = $79 ;Math Operator: "ADD" Precedence Code
+P_MUL         = $7B ;Math Operator: "MUL" Precedence Code
+P_PWR         = $7D ;Math Operator: "PWR" Precedence Code
+P_NEQ         = $7F ;Math Operator: "NEQ" Precedence Code
+P8_RD_BLOCK   = $80 ;Originally: P8.READ.BLOCK
+P8_WR_BLOCK   = $81 ;Originally: P8.WRITE.BLOCK
+TOK_FOR       = $81 ;Token: "FOR" Program Control Statement
+P8_GET_TIME   = $82 ;Originally: P8.GET.TIME
+CTRLCH        = $83 ;High ASCII Ctrl+C Character
+TOK_DATA      = $83 ;Token: "DATA" Data Assignment Statement
+ERR_ZERODIV   = $85 ;"?Division By Zero" Error Index
+BELL_H        = $87 ;High ASCII Ctrl-G: Sound Bell Character
+BSH           = $88 ;High ASCII Ctrl-H: Backspace
+LFH           = $8A ;High ASCII Ctrl-J: Line Feed
+RTNH          = $8D ;High ASCII Ctrl-M: Carriage Return
+BCC           = $90 ;Branch if Carry is Clear OpCode
+CTRLSH        = $93 ;High ASCII Ctrl+S Character
+ERR_ILLDIR    = $95 ;"?Illegal Direct" Error Index
+PICK          = $95 ;Right-Arrow Key Code: Ctrl-U (NAK)
+CTRLXH        = $98 ;High ASCII Cancel Character (Ctrl+X)
+ESCH          = $9B ;High ASCII Escape Character (Ctrl+[)
+ERR_BADTYPE   = $A3 ;"?Type Mismatch" Error Index
+TOK_GOTO      = $AB ;Token: "GOTO" Program Control Statement
+ERR_STRLONG   = $B0 ;"?String Too Long" Error Index
+TOK_GOSUB     = $B0 ;Token: "GOSUB" Program Control Statement
+TOK_REM       = $B2 ;Token: "REM" Prgrm-Documentation Statement
+TOK_PRINT     = $BA ;Token: "PRINT" Output Statement
+ERR_FRMCPX    = $BF ;"?Formula Too Complex" Error Index
+HGRHIGH       = $C0 ;Hi-Res Graphics Screens Height: 192 Pixels
+P8_CREATE     = $C0 ;Originally: P8.CREATE
+TOK_TAB       = $C0 ;Token: "TAB(" Cursor Position Statement
+P8_DESTROY    = $C1 ;Originally: P8.DESTROY
+TOK_TO        = $C1 ;Token: "TO" Program Control Statement
+P8_RENAME     = $C2 ;Originally: P8.RENAME
+TOK_FN        = $C2 ;Token: "FN" Function Assignment Statement
+P8_SETFNFO    = $C3 ;Originally: P8.SET.FILE.INFO
+TOK_SPC       = $C3 ;Token: "SPC(" Cursor Position Statement
+P8_GETFNFO    = $C4 ;Originally: P8.GET.FILE.INFO
+TOK_THEN      = $C4 ;Token: "THEN" Conditional Statement
+P8_ONLINE     = $C5 ;Originally: P8.ONLINE
+TOK_AT        = $C5 ;Token: "AT" Graphics Drawing Statement
+P8_SETPREFX   = $C6 ;Originally: P8.SET.PREFIX
+TOK_NOT       = $C6 ;Token: "NOT" Conditional Statement
+P8_GETPREFX   = $C7 ;Originally: P8.GET.PREFIX
+TOK_STEP      = $C7 ;Token: "STEP" Conditional Statement
+P8_OPEN       = $C8 ;Originally: P8.OPEN
+TOK_PLUS      = $C8 ;Token: "+" (Plus) Math Function
+P8_NEWLINE    = $C9 ;Originally: P8.NEWLINE
+TOK_MINUS     = $C9 ;Token: "-" (Minus) Math Function
+P8_READ       = $CA ;Originally: P8.READ
+P8_WRITE      = $CB ;Originally: P8.WRITE
+P8_CLOSE      = $CC ;Originally: P8.CLOSE
+P8_FLUSH      = $CD ;Originally: P8.FLUSH
+P8_SET_MARK   = $CE ;Originally: P8.SET.MARK
+TOK_GREATER   = $CF ;Token: ">" (Greater Than) Cond. Statement
+P8_GET_MARK   = $CF ;Originally: P8.GET.MARK
+P8_SET_EOF    = $D0 ;Originally: P8.SET.EOF
+TOK_EQUAL     = $D0 ;Token: "=" (Equal To) Cond. Statement
+P8_GET_EOF    = $D1 ;Originally: P8.GET.EOF
+ERR_CANTCONT  = $D2 ;"?Can't Continue" Error Index
+P8_SET_BUF    = $D2 ;Originally: P8.SET.BUF
+TOK_SGN       = $D2 ;Token: "SGN" Math Function
+P8_GET_BUF    = $D3 ;Originally: P8.GET.BUF
+TOK_SCRN      = $D7 ;Token: "SCRN(" LoRes (X,Y) Color Statement
+ERR_UNDEFFUNC = $E0 ;"?Undef'd Function" Error Index
+CIOPG         = $FD ;Monitor Char I/O S/R Vectors Page Address
+;CIOPG        = $FD ;[KEYIN ($FD1B) & COUT1 ($FDF0) S/Rs Page]
+ERR_BADRESP   = $FE ;'Bad Response to Input' Error Code
+CTRLCIRQ      = $FF ;"CTRL C INTERUPT ATTEMPTED" ONERR Code
+DELETE        = $FF ;High ASCII "DELETE" character
+HGRWIDE     = $0118 ;Hi-Res Graphics Screens Width: 280 Pixels
+IOADR       = $C000 ;Hardware I/O Addresses & Soft Switches
+
+
+;==============================================================
+; Zero Page Equates
+;==============================================================
+;GOWARM is setup by Cold Start, but is not used anywhere!
+;GOWARM     @   $00 ;Gets "JMP RESTART"                    (3B)
+;--------------------------------------------------------------
+LOC0        @   $00 ;=GOWARM; Preset to JMP OpCode ($4C)
+LOC1        @   $01 ;Preset to BASIC Soft/Warm/Ctrl-C Entry Pt.
+LOC2        @   $02 ;Preset to BASIC Soft/Warm/Ctrl-C Entry Pt.
+;--------------------------------------------------------------
+SHFTPTR     @   $01 ;Used in Shifting Right (ROR) LOC1-4,X (1B)
+;LOC2       @   $02 ;Used in Shifting Right (ROR) LOC1-4,X (1B)
+;--------------------------------------------------------------
+;GOSTROUT is setup by Cold Start, but is not used anywhere!
+;GOSTROUT   @   $03 ;Gets "JMP STROUT"                     (3B)
+;--------------------------------------------------------------
+LOC3        @   $03 ;=GOSTROUT; Preset to JMP OpCode ($4C)
+LOC4        @   $04 ;=GOSTROUT+1; Gets "JMP STROUTL"
+LOC5        @   $04 ;=GOSTROUT+2; Gets "JMP STROUTH"
+;--------------------------------------------------------------
+;USR        @   $0A ;Gets "JMP <User Addr>" (First=$E199)  (3B)
+;GOUSR      @   $0A ;Gets "JMP <User Addr>" (First=$E199)  (3B)
+;--------------------------------------------------------------
+BAS_USRVEC  @   $0A ;Applesoft USR() Command Vector (JMP)  (3B)
+BAS_USRPTR  @   $0B ;Applesoft USR() Command Pointer       (2B)
+;--------------------------------------------------------------
+CHARAC      @   $0D ;Applesoft String Terminator, Alternate
+ENDCHR      @   $0E ;Applesoft String Terminator, Primary
+;--------------------------------------------------------------
+TKNCNTR     @   $0F ;Holds Current Token (-$80)
+;TKNCNTR    @   $0F ;Applesoft Token-Name Character-Counter
+EOLPTR      @   $0F ;Applesoft End-of-Line Pointer
+NUMDIM      @   $0F ;Number of Applesoft Array Dimensions
+;--------------------------------------------------------------
+DIMFLG      @   $10 ;Array Dimension Flag (DIM Call <> 0)
+;--------------------------------------------------------------
+VALTYP      @   $11 ;Applesoft Variable Type ($00=Num, $FF=Str)
+;VALTYP     @   $11 ;Last FAC Op Flag ($00=Num, $FF=Str)
+;VALTYP+1   @   $12 ; If ($:VALTYP=$FF; %:VALTYP+1=$80)
+INTFLG      @   $12 ;Negative for Integer Variable (%)
+;--------------------------------------------------------------
+DATAFLG     @   $13 ;Applesoft DATA Statement Flag
+GARFLG      @   $13 ;Applesoft Garbage Collection Flag
+SUBFLG      @   $14 ;Subscript Flag ($00=Allowed, $80=NOT)
+;SUBFLG     @   $14 ;[$40=Flag "Called from GETARYPTR" ($F7D9)]
+INPUTFLG    @   $15 ;Input Flag ($00=INPUT, $40=GET, $98=READ)
+;--------------------------------------------------------------
+CPRMASK     @   $16 ;Applesoft Compare Mask [(CPRTYP)<-FRMEVL]
+;                   ;Gets Comparison Type from Format Evaluator
+;--------------------------------------------------------------
+SIGNFLG     @   $16 ;Applesoft Trig Functions Sign Flag    (1B)
+HSHAPE      @   $1A ;Applesoft Hi-Res Screen Byte Pointer
+;HSHAPE     @   $1A ;Applesoft Hi-Res Shape Address Safe
+HCOLOR1     @   $1C ;Applesoft Hi-Res Color Mask
+;HCOLOR1    @   $1C ;Originally: HBITS
+HCOUNT      @   $1D ;Applesoft Hi-Res Line Step            (2B)
+COUNTL      @   $1D ;Applesoft Hi-Res Line Step, Low
+COUNTH      @   $1E ;Applesoft Hi-Res Line Step, High
+WNDLFT      @   $20 ;Left Column of Scroll Window
+;WNDLFT     @   $20 ;Originally: WNDLEFT
+WNDWDTH     @   $21 ;Width of Scroll Window
+WNDTOP      @   $22 ;Top of Scroll Window
+WNDBTM      @   $23 ;Bottom of Scroll Window
+CH          @   $24 ;Cursor Horizontal Displacement
+CV          @   $25 ;Cursor Vertical Displacement
+IWMDATAPTR  @   $26 ;IWM: Pointer to Boot1 Data Buffer
+GBASL       @   $26 ;Graphics Base Address, Low
+;HBASL      @   $26 ;Graphics Base Address, Low
+GBASH       @   $27 ;Graphics Base Address, High
+;HBASH      @   $27 ;Graphics Base Address, High
+BASL        @   $28 ;Text Base Address, Low
+BASH        @   $29 ;Text Base Address, High
+BAS2L       @   $2A ;Scrolling Destination Line Pointer, Low
+IWMSLTNDX   @   $2B ;IWM: Slot Number << 4
+BAS2H       @   $2B ;Scrolling Destination Line Pointer, High
+H2          @   $2C ;Right End of Horizontal Line (HLINE)
+LMNEM       @   $2C ;Instruction Display Mnemonic Left Byte
+V2          @   $2D ;Bottom End of Vertical Line (VLINE)
+RMNEM       @   $2D ;Instruction Display Mnemonic Right Byte
+CHKSUM      @   $2E ;Cassette Tape Input Accumulated Checksum
+FORMAT      @   $2E ;Disassembler Instruction Display Format
+MASK        @   $2E ;Lo-Res Graphics Color Mask (Apple IIc)
+LASTIN      @   $2F ;Cassette Input Voltage Change Detector
+LENGTH      @   $2F ;Disassembler Instruction Display Length
+;COLOR      @   $30 ;Graphics On-the-Fly Bit Mask (Color Safe)
+;GMASK      @   $30 ;Graphics On-the-Fly Bit Mask (Color Safe)
+HMASK       @   $30 ;Graphics On-the-Fly Color Bit Mask Safe
+MODE        @   $31 ;Monitor Mode Flag
+INVFLG      @   $32 ;Text Mask (Normal=$FF, Flash=$7F, Inv=$3F)
+INVFLAG     @   $32 ;Text Mask (Normal=255, Flash=127, Inv=063)
+PROMPT      @   $33 ;Command Prompt Character
+YSAV        @   $34 ;Y-Reg Safe For Monitor Command Processing
+YSAV1       @   $35 ;Y-Reg Safe; Save across JSR VIDOUT/VIDWAIT
+CSWL        @   $36 ;Character Output Hook, Low
+CSWH        @   $37 ;Character Output Hook, High
+KSWL        @   $38 ;Character Input Hook, Low
+KSWH        @   $39 ;Character Input Hook, High
+PCL         @   $3A ;Program Counter Safe, Low
+PCH         @   $3B ;Program Counter Safe, High
+;--------------------------------------------------------------
+; General Purpose (A#) Registers (For Monitor S/R Parameters)
+;--------------------------------------------------------------
+IWMBITS     @   $3C ;IWM: Temp Storage for Bit Manipulation
+A1L         @   $3C ;Monitor General Purpose A1-Reg, Low
+IWMSECTOR   @   $3D ;IWM: Sector to Read
+A1H         @   $3D ;Monitor General Purpose A1-Reg, High
+A2L         @   $3E ;Monitor General Purpose A2-Reg, Low
+A2H         @   $3F ;Monitor General Purpose A2-Reg, High
+IWMTRKFND   @   $40 ;IWM: Track Found
+A3L         @   $40 ;Monitor General Purpose A3-Reg, Low
+IWMTRACK    @   $41 ;IWM: Track to Read
+A3H         @   $41 ;Monitor General Purpose A3-Reg, High
+A4L         @   $42 ;Monitor General Purpose A4-Reg, Low
+A4H         @   $43 ;Monitor General Purpose A4-Reg, High
+A5L         @   $44 ;Monitor General Purpose A5-Reg, Low
+A5H         @   $45 ;Monitor General Purpose A5-Reg, High
+;--------------------------------------------------------------
+; 6502 Registers Safe (Save Locations) [Includes PCL/PCH above]
+;--------------------------------------------------------------
+ACC         @   $45 ;A-Reg Safe (Accumulator) [Destroys A5H!]
+XREG        @   $46 ;X-Reg Safe (Index Register X)
+YREG        @   $47 ;Y-Reg Safe (Index Register Y)
+STATUS      @   $48 ;P-Reg Safe (Status Register)
+SPNT        @   $49 ;S-Reg Safe (Stack Pointer)
+;--------------------------------------------------------------
+SAVE6502    @   $4A ;6502 Registers Safe (Save Locations)+5
+;                   ;FAF4: LDA ACC+5,X ... FAF9: INX ;Count UP
+;                   ;(X)=[($FB=251={-5})~($FF=255={-1})]
+;--------------------------------------------------------------
+RNDL        @   $4E ;Keyin Random Counter Value, Low
+RNDH        @   $4F ;Keyin Random Counter Value, High
+;--------------------------------------------------------------
+LINNUM      @   $50 ;Applesoft Line Number                 (2B)
+TEMPPT      @   $52 ;Applesoft Temporary Point             (2B)
+TEMPPT      @   $52 ;SD Stack: Next Temp Descriptor Ptr    (1B)
+LASTPT      @   $53 ;Applesoft Temporary Point             (2B)
+LASTPT      @   $53 ;SD Stack: Last Temp Descriptor Ptr    (1B)
+TEMPST      @   $55 ;~$5D: Holds up to 3 Descriptors       (9B)
+;--------------------------------------------------------------
+INDEX       @   $5E ;Move Strings Index Pointer            (2B)
+LINPTR      @   $5E ;Move Strings Line Pointer             (2B)
+SRCPTR      @   $5E ;Move Strings Source Pointer           (2B)
+STKPTR      @   $5E ;Move Strings Stack Pointer            (2B)
+DSTPTR      @   $60 ;Move Strings Destination Pointer      (2B)
+;--------------------------------------------------------------
+RESULT      @   $62 ;~$66: FP Result of Last Mult* or Div/ (5B)
+;TEXTTAB    @   $67 ;Applesoft Start of Program Text Ptr   (2B)
+TXTTAB      @   $67 ;Applesoft Start of Program Pointer    (2B)
+VARTAB      @   $69 ;Applesoft Start of Variables Pointer  (2B)
+ARYTAB      @   $6B ;Applesoft Start of Arrays Pointer     (2B)
+STREND      @   $6D ;End of Variables & Pointers Storage   (2B)
+;STREND     @   $6D ;Numeric/Array/String Storage End Ptr  (2B)
+FRETOP      @   $6F ;FreSpcEnd & StringStorageStart Ptr    (2B)
+;FRETOP     @   $6F ;Applesoft End of Free Space Pointer   (2B)
+;FRETOP     @   $6F ;Applesoft Start of String Storage Ptr (2B)
+FRESPC      @   $71 ;Applesoft String Routines' Temp Ptr   (2B)
+;--------------------------------------------------------------
+MEMSIZ      @   $73 ;Applesoft End of String Space (HIMEM) (2B)
+MEMSIZE     @   $73 ;Applesoft HIMEM Address Pointer       (2B)
+; Address of the highest memory location available to a program
+; Current value of HIMEM: PRINT PEEK(ll6)*256 + PEEK(ll5)
+;--------------------------------------------------------------
+CURLIN      @   $75 ;Current Applesoft Line Number         (2B)
+; CURLIN = $FFXX if in Direct (type in at command prompt) Mode
+;--------------------------------------------------------------
+OLDLIN      @   $77 ;Last Applesoft Line Executed, Address (2B)
+OLDTEXT     @   $79 ;Applesoft Old Text Pointer            (2B)
+DATLIN      @   $7B ;Line Number of Current DATA Statement (2B)
+DATPTR      @   $7D ;Address of Current DATA Statement     (2B)
+INPTR       @   $7F ;Applesoft Input Pointer               (2B)
+VARNAM      @   $81 ;Last-Used Variable Name Pointer       (2B)
+;VARNAM     @   $81 ;$:+-, %:--, Real:++, Function:-+   (Bytes) 
+VARPTR      @   $83 ;Last-Used Variable Value Pointer      (2B)
+;--------------------------------------------------------------
+FORPTR      @   $85 ;Applesoft General Purpose Pointer     (2B)
+; Address of Variable if "FOR" or "NEXT"; $XXFF if called from
+; "POPRTN" <<< BUG: Should be $FFXX >>>
+;FORPTR     @   $85 ;Originally: FORPNT
+;--------------------------------------------------------------
+TXPSV       @   $87 ;TXTPTR Safe: Used in INPUT routine    (2B)
+LASTOP      @   $87 ;Applesoft FRMEVL Scratch Flag         (1B)
+CPRTYP      @   $89 ;Applesoft FRMEVL Compare Flag (>,=,<) (1B)
+TEMP3       @   $8A ;~$8E: Applesoft Temporary FAC #3      (5B)
+FNCNAM      @   $8A ;Applesoft Function Name Pointer       (2B)
+DSCPTR      @   $8C ;Applesoft String Descriptor Pointer   (2B)
+DSCLEN      @   $8F ;Applesoft String Descriptor Length    (1B)
+;DSCLEN     @   $8F ;Used in Garbage Collection, too!      (1B)
+;--------------------------------------------------------------
+JMPADRS     @   $90 ;Applesoft Jump (from ZP) to <Address> (3B)
+;JMPADRS    @   $90 ;Gets "JMP <Address>" (First=$E646)    (3B)
+;--------------------------------------------------------------
+; The JMPADRS <Address> bytes are also being used for the fol-
+; lowing two items, which might potentially cause problems!--If
+; JMPADRS is not used immediatly after setting the <Address>.--
+; Or, if GARLEN or ARGEXT are in use and overwritten for a JMP.
+;--------------------------------------------------------------
+GARLEN      @   $91 ;Applesoft Garbage Collection Length   (1B)
+;GARLEN     @   $91 ;Renamed from LENGTH: which is in use above
+;--------------------------------------------------------------
+ARGEXT      @   $92 ;ARG Extra Precision Byte for FP Op's  (1B)
+;ARGEXT     @   $92 ;Originally: ARG.EXTENSION
+;--------------------------------------------------------------
+TEMP1       @   $93 ;~$97: Save Areas for FAC              (5B)
+TEMP1       @   $93 ;Applesoft FP Math Register            (1B)
+ARYPTR      @   $94 ;Applesoft Array Pointer               (2B)
+;ARYPTR     @   $94 ;Used in Garbage Collection, too!      (2B)
+;ARYPTR     @   $94 ;Originally: ARYPNT
+HIGHDS      @   $94 ;Copy Ptr: Highest Destination Adrs +1 (2B)
+;HIGHDSL    @   $94 ;Applesoft Block Copy Pointer, Low     (2B)
+;HIGHDSH    @   $95 ;Applesoft Block Copy Pointer, High    (2B)
+HIGHTR      @   $96 ;Copy Ptr: Highest Source Address +1   (2B)
+;--------------------------------------------------------------
+TEMP2       @   $98 ;Applesoft FP Math Register            (2B)
+TMPEXP      @   $99 ;Used in Applesoft FIN (Eval) Routine  (1B)
+INDX        @   $99 ;Used by Applesoft Array Returns       (1B)
+EXPON       @   $9A ;Applesoft Exponent Safe               (1B)
+;EXPON      @   $9A ;Used by Applesoft Array Returns       (1B)
+LOWTR       @   $9B ;Copy Ptr: Lowest Source Address       (2B)
+;LOWTR      @   $9B ;Applesoft General Purpose Pointer     (2B)
+;LOWTR      @   $9B ;Applesoft Block Copy Pointer          (2B)
+DPFLG       @   $9B ;Applesoft Decimal Point Flag          (1B)
+EXPSGN      @   $9C ;Applesoft Exponent Sign Safe          (1B)
+;==============================================================
+; These next labels are sharing with the Applesoft FAC below:
+;--------------------------------------------------------------
+;DSCTMP     @   $9D ;Used by HPLOT to move Y-Reg to X-Reg  (1B)
+DSCTMP      @   $9D ;Temp Descriptor, String Length        (1B)
+DSCTMPL     @   $9E ;Temp Descriptor, String Addr, Low     (1B)
+DSCTMPH     @   $9F ;Temp Descriptor, String Addr, High    (1B)
+TMPVPTR     @   $A0 ;Temporary Variable Pointer (FAC+3,4)  (2B)
+;==============================================================
+; These next labels are out of order; they actually go between
+; the Applesoft FACs, primary (FAC) and secondary (ARG), below:
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+SERLEN      @   $A3 ;Holds Length of Series-1              (1B)
+SHFTSGNX    @   $A4 ;FAC Right Shift Sign Extension        (1B)
+;SHFTSGNX   @   $A4 ;Originally: SHIFT.SIGN.EXT
+;==============================================================
+; This next label is sharing with the Applesoft ARG below:
+;--------------------------------------------------------------
+ARGVPTR     @   $A8 ;Applesoft Temporary Variable Pointer  (2B)
+;==============================================================
+; Preamble about the Applesoft Floating Point Accumulators
+; [FAC & ARG (6 Bytes each)]:
+;--------------------------------------------------------------
+; Significand is the Most Significant Part of a Number; and,
+; Mantissa is the fractional part of a Decimal Number, to the
+; right of the decimal point:
+;==============================================================
+; These FAC addresses are also used for other things:
+;--------------------------------------------------------------
+FAC         @   $9D ;Primary Floating Point Accumulator    (6B)
+;FACX       @   $9D ;1st FAC Exponent [Signed=(-128..+0..+127)]
+;FACT       @   $9E ;1st FAC Mantissa, Top [Signed (" " ")]
+;FACH       @   $9F ;1st FAC Mantissa, High 
+;FACM       @   $A0 ;1st FAC Mantissa, Middle
+;FACL       @   $A1 ;1st FAC Mantissa, Low
+FACSIGN     @   $A2 ;Primary FAC Unpacked Sign (msb)       (1B)
+;~~~~~~~~~~ @ ~ $A3-$A4 ~~ (See above) ~~~~~~~~~~~~~~~~~~~~~~~~
+ARG         @   $A5 ;Secondary Floating Point Accumulator  (6B)
+;ARGX       @   $A5 ;2nd FAC Exponent [Signed=(-128..+0..+127)]
+;ARGT       @   $A6 ;2nd FAC Mantissa, Top [Signed (" " ")]
+;ARGH       @   $A7 ;2nd FAC Mantissa, High 
+;ARGM       @   $A8 ;2nd FAC Mantissa, Middle
+;ARGL       @   $A9 ;2nd FAC Mantissa, Low
+ARGSIGN     @   $AA ;Secondary FAC Unpacked Sign (msb)     (1B)
+;==============================================================
+SGNCPR      @   $AB ;Applesoft Sign Flag for Comparing     (1B)
+STRNG1      @   $AB ;Applesoft String Pointer #1           (2B)
+;--------------------------------------------------------------
+FACEXT      @   $AC ;FAC Extra Precision Byte for FP Op's  (1B)
+;FACEXT     @   $AC ;Originally: FAC.EXTENSION
+;EXTRAFAC   @   $AC ;Used as FP Precision Flag, too!
+;--------------------------------------------------------------
+SERPTR      @   $AD ;Pointer to Series Data in FP Op's     (2B)
+STRNG2      @   $AD ;Applesoft String Pointer #2           (2B)
+PRGEND      @   $AF ;Applesoft End of Program Pointer      (2B)
+;==============================================================
+; Applesoft's GENERIC CHRGET subroutine (at $F10B~$F122)
+; gets copied here (to $B1~$C8) during initialization:
+;--------------------------------------------------------------
+CHRGET      @   $B1 ;~$C8: Get Next Char/Token ZP-Routine (24B)
+CHRGOT      @   $B7 ;~$C8: CHRGET w/o advancing TXTPTR    (18B)
+TXTPTR      @   $B8 ;CHRGET's Next Char/Token Pointer      (2B)
+TXTPTRL     @   $B8 ;CHRGET's Next Char/Token Ptr, Low     (1B)
+TXTPTRH     @   $B9 ;CHRGET's Next Char/Token Ptr, High    (1B)
+RNDSEED     @   $C9 ;~$CD: Applesoft FP Random Number Seed (5B)
+;RNDSEED ($C9~$CC) gets copied too, except for last byte ($CD).
+;==============================================================
+; "HGR*" ($D0~$D5) Renamed from "HGR.*"
+HGRDX       @   $D0 ;Hi-Res Drawing Horizontal X-Position  (2B)
+HGRDY       @   $D2 ;Hi-Res Drawing  Vertical  Y-Position  (1B)
+HGRQUAD     @   $D3 ;Hi-Res Graphics Drawing Quadrant      (1B)
+;HGRQUAD    @   $D3 ;Originally: HGR.QUADRANT
+HGRE        @   $D4 ;Used in Hi-Res Graphics Drawing       (2B)
+;--------------------------------------------------------------
+AUTORUN     @   $D6 ;AutoRun/Lock: No User Access If >=$80 (1B)
+LOCK        @   $D6 ;AutoRun/Lock: No User Access If >=$80 (1B)
+;UNUSED     @   $D7 ;UNUSED?                               (1B)
+ERRFLG      @   $D8 ;ONERR GOTO is Active If = #$80        (1B)
+ERRLIN      @   $DA ;Applesoft Line# Where ERROR Occurred  (2B)
+ERRPOS      @   $DC ;Applesoft Error Handler TXTPTR Safe   (2B)
+;ERRPOS     @   $DC ;Error Position in Applesoft Line Safe (2B)
+ERRNUM      @   $DE ;Current Applesoft Error Number Safe   (1B)
+ERRSTK      @   $DF ;Applesoft Stack Ptr before Error Safe (1B)
+;--------------------------------------------------------------
+; "HGR*" ($E0~$EF) Renamed from "HGR.*"
+HGRX        @   $E0 ;Hi-Res Graphics X-Coordinate (H-POSN) (2B)
+HGRY        @   $E2 ;Hi-Res Graphics Y-Coordinate (V-POSN) (2B)
+HGRCOLOR    @   $E4 ;Hi-Res Graphics Color Flag/Safe       (1B)
+HGRHORIZ    @   $E5 ;Hi-Res Byte Horiz. Index from GBASL,H (1B)
+HGRPAGE     @   $E6 ;Hi-Res Base Page (HPg1=$20, HPg2=$40) (1B)
+HPAG        @   $E6 ;Hi-Res Page (1=$20/2=$40) to Draw on  (1B)
+SCALE       @   $E7 ;Hi-Res Graphics Drawing Scale Factor  (1B)
+HGRSCALE    @   $E7 ;Hi-Res Graphics Drawing Scale Factor  (1B)
+HGRSHPTR    @   $E8 ;Hi-Res Graphics Shape Pointer         (2B)
+;HGRSHPTR   @   $E8 ;Originally: HGR.SHAPE.PNTR
+HGRCLSN     @   $EA ;Hi-Res Graphics Collision Counter     (2B)
+;HGRCLSN    @   $EA ;Originally: HGR.COLLISIONS
+;--------------------------------------------------------------
+FIRST       @   $F0 ;Lo-Res Plot Coordinates               (1B)
+SPEEDZ      @   $F1 ;Text Output Speed Limiter             (1B)
+SPDBYT      @   $F1 ;Text Output Speed Limiter             (1B)
+TRCFLG      @   $F2 ;Trace OFF/ON Flag (<128/>127)~(bit-7) (1B)
+FLASHBIT    @   $F3 ;Flash Text? (Flash=$40, Else=$00)     (1B)
+;FLASHBIT   @   $F3 ;Originally: FLASH.BIT
+ORMASK      @   $F3 ;Mask for Applesoft Output Control     (1B)
+TXTPSV      @   $F4 ;Applesoft Char/Token Pointer Safe     (2B)
+CURLSV      @   $F6 ;Applesoft Current Line Safe           (2B)
+REMSTK      @   $F8 ;Stack Ptr Before Each Statement Safe  (1B)
+HGRROT      @   $F9 ;Hi-Res Graphics Rotation Value        (1B)
+;HGRROT     @   $F9 ;Originally: HGR.ROTATION              (1B)
+;--------------------------------------------------------------
+;END_OF_ZP  @   $FF ;End of Zero Page = STACK-1            (1B)
+FOUTBUFF    @   $FF ;Start String at STACK-1 ($FF)         (1B)
+; STACK-1 ($FF )is also used by the String Out routines; e.g.:
+;           LDA #<STACK-1 ;POINT TO STACK-1
+;           LDY #>STACK-1 ;(WHICH=0)
+;           STA STACK-1,Y
+;==============================================================
+
+;==============================================================
+; Page 1 ($01) Equates
+;==============================================================
+STACK       @ $0100 ;Apple-II 6502 Microprocessor Stack
+;STACK+1    @ $0101
+;STACK+2    @ $0102
+;STACK+3    @ $0103
+;STACK+9,X  @ $0109 ;STEP Sign [(-1,0,1)=(Direction)]      (1B)
+;STACK+15,X @ $010F ;Current FOR Statement's Line Number   (2B)
+;STACK+18,X @ $0112 ;Address of Statement after FOR        (2B)
+;--------------------------------------------------------------
+LINEIMAGE   @ $01FB ;Program's New Line Image (should be zero)
+;LINEIMAGE  @ $01FB ;Zero indicates Start of Program (1st.line)
+IMGNXLNPTR  @ $01FC ;New Line Image's Next Line Pointer
+IMGLINNUM   @ $01FE ;New Line Image's Line Number
+;==============================================================
+
+
+;==============================================================
+; Page 2 ($02) Equates
+;==============================================================
+;IN         @ $0200 ;Input Buffer [Range:(512~767)=($200~$2FF)]
+;INPUT      @ $0200 ;IN is too short to be used as a label!
+;--------------------------------------------------------------
+;INPUT      @ $0200 ;Input Buffer [Range:(512~767)=($200~$2FF)]
+;INPUT      @ $0200 ;INPUT is too common to be used as a label!
+;--------------------------------------------------------------
+INBUFF      @ $0200 ;Input Buffer [Range:(512~767)=($200~$2FF)]
+;INBUFF     @ $0200 ;Originally: INPUT.BUFFER
+;==============================================================
+
+
+;==============================================================
+; Page 3 ($03) Equates
+;==============================================================
+; Page 3 [DOS 3.3 Addresses & Constants]
+;--------------------------------------------------------------
+TWOSBUFF    @ $0300 ;Holds the 6+2 2-bit Chunks of Data
+;TWOSBUFF   @ $0300 ;Originally: TWOS_BUFFER [McFadden Label]
+CNVTBL      @ $0356 ;6+2 Conversion Table (128 Bytes of Memory)
+;CNVTBL     @ $0356 ;(Table Entries vary between: $0356-$03D5)!
+;CNVTBL     @ $0356 ;Originally: CONV_TAB    [McFadden Label]
+;--------------------------------------------------------------
+;CNVTBL-128 @ $02D6 ;Actual lookup will be on Hi-Bit Set Bytes,
+;CNVTBL-128 @ $02D6 ; so they will be read from CNVTBL-128
+;CNVTBL-128 @ $02D6 ;[($2D6)=($356-$80)=(CNVTBL-128)]
+;CNVTBL-128 @ $02D6 ; 1st Entry is at [($2D6+$96)=($36C)]
+;--------------------------------------------------------------
+; These Vectors [Set by DOS] are NOT in the New Monitor;
+; And, these Mnemonics are Undocumented Suggestions [by JPD].
+;--------------------------------------------------------------
+DOS_WRM     @ $03D0 ;DOS Warm Start Entry Point
+;  ^----------------;[Andy McFadden's Label]
+;--------------------------------------------------------------
+GO3D0G      @ $03D0 ;"3-Dog-Night" Warm Start Monitor Command:
+BASWARM     @ $03D0 ;In Monitor Command Mode, 3D0G returns a
+DOSWARM     @ $03D0 ;user to Applesoft BASIC (Warm Starts it);
+WARMRTN     @ $03D0 ;Warm Return is NOT SET by Applesoft BASIC,
+;               976 ;It's SET by DOS to its Warm Start ($9DBF);
+;                   ;[See also (antithesis): MON/MONZ,
+;                   ;Monitor Entry Points (from BASIC)].
+;--------------------------------------------------------------
+DOS_CLD     @ $03D3 ;DOS Cold Start Entry Point
+;  ^----------------;[Andy McFadden's Label]
+;--------------------------------------------------------------
+GO3D3G      @ $03D3 ;"3-Dog-Night" Cold Start Monitor Command:
+BASCOLD     @ $03D3 ;In Monitor Command Mode, 3D3G returns a
+DOSCOLD     @ $03D3 ;user to Applesoft BASIC (Cold Starts it);
+COLDRTN     @ $03D3 ;Cold Return is NOT SET by Applesoft BASIC,
+;               979 ;It's SET by DOS to its Cold Start ($9D84);
+;                   ;[See also (antithesis): MON/MONZ,
+;                   ;Monitor Entry Points (from BASIC)].
+;==============================================================
+DOS_FM      @ $3D6 ;DOS File Manager (FM) Entry Point
+DOS_RWTS    @ $3D9 ;Read/Write Track+Sector (RWTS) Entry Point
+DOS_LOCFPL  @ $3DC ;Loads Y/A with FM Parameter List Address
+DOS_LOCRPL  @ $3E3 ;Loads Y/A with RWTS IOB Address
+;==============================================================
+; Page 3 [Interupt & User Supplied Routine (USR)] Vectors
+;==============================================================
+GOBRKV      @ $03EF ;Set by DOS to JMP for User BRK Vector
+BRKV        @ $03F0 ;User BRK Vector (Address of Break Handler)
+SOFTEV      @ $03F2 ;Soft Entry (Warm Start) Vector
+SOFTEVEC    @ $03F2 ; (Address of Reset Handler)
+PWREDUP     @ $03F4 ;Power-Up Reset CHKSUM [(SOFTEV+1)EOR #$A5]
+;                   ;PWREDUP must equal == [(SOFTEV+1)EOR #$A5]
+AMPERV      @ $03F5 ;Ampersand (&) Command Vector (JMP)
+;AMPERV     @ $03F5 ;Originally: AMPERSAND.VECTOR
+;--------------------------------------------------------------
+USRADR      @ $03F8 ;Monitor User Command (Ctrl-Y) Vector
+USRADDR     @ $03F8 ;Monitor User Command (Ctrl-Y) Vector
+;USRADDR    @ $03F8 ;Jump to (USR); User Supplied Routine
+NMI         @ $03FB ;Non-Maskable Interrupt (NMI) Vector
+NMIVEC      @ $03FB ;Jump to (NMI) Handler
+IRQLOC      @ $03FE ;Maskable Interrupt Requests (IRQ) Vector
+IRQADDR     @ $03FE ;Address of IRQ Handler
+;==============================================================
+
+
+;==============================================================
+; Page 4 ($04) Equates
+;==============================================================
+LINE1       @ $0400 ;Text Screen Start Address
+;==============================================================
+
+
+;==============================================================
+; Page 5 ($05) Equates
+;==============================================================
+OURCH       @ $057B ;Screen Hole used in New ROMs & Apple IIc
+;==============================================================
+
+
+;==============================================================
+; Page 7 ($07) Equates
+;==============================================================
+MON_TEMP2   @ $07FB ;Monitor Safe, Temporary
+MSLOT       @ $07F8 ;Slot Number ($CS) of Peripheral Card
+;==============================================================
+
+
+;==============================================================
+; Page 8 ($08) Equates
+;==============================================================
+BOOT1       @ $0800 ;DOS Buffer for Next Stage of Loader
+PRGMEM      @ $0800 ;Initial Start of Program Memory
+;==============================================================
+
+HGR1SCRN    @ $2000 ;~$3FFF: Hi-Res Screen Pg.1 (Base-Address)
+HGR2SCRN    @ $4000 ;~$5FFF: Hi-Res Screen Pg.2 (Base-Address)
+
+;==============================================================
+; Page 182 ($B6) Equates
+;==============================================================
+; Copy of the Disk II Controller Card ROM (BOOT0 Code) 
+;--------------------------------------------------------------
+; In the Apple II Plus ROM image, this address space ($B600-
+; $B6FF) is a copy (or vice-versa) of the Slot 6 address space
+; ($C600-$C6FF).  These labels do not need to be listed twice, 
+; so they're only listed below (with $C6 addresses), not here.
+;==============================================================
+
+
+;==============================================================
+; Page 191 ($BF) Equates
+;==============================================================
+; Prodos 8 Addresses & Constants
+;==============================================================
+P8_MLI      @ $BF00     ;ProDOS MLI Entry Point
+;--------------------------------------------------------------
+; ProDOS 8 MLI Function Codes
+; (These are Constants, NOT Zero Page Equates)
+;--------------------------------------------------------------
+*TAG ProDOS8-MLI-Functions
+P8_ALNTRPT    = $40 ;Originally: P8.ALLOC.INTERRUPT
+P8_DALNTRPT   = $41 ;Originally: P8.DEALLOC.INTERRUPT
+P8_QUIT       = $65 ;Originally: P8.QUIT
+P8_RD_BLOCK   = $80 ;Originally: P8.READ.BLOCK
+P8_WR_BLOCK   = $81 ;Originally: P8.WRITE.BLOCK
+P8_GET_TIME   = $82 ;Originally: P8.GET.TIME
+P8_CREATE     = $C0 ;Originally: P8.CREATE
+P8_DESTROY    = $C1 ;Originally: P8.DESTROY
+P8_RENAME     = $C2 ;Originally: P8.RENAME
+P8_SETFNFO    = $C3 ;Originally: P8.SET.FILE.INFO
+P8_GETFNFO    = $C4 ;Originally: P8.GET.FILE.INFO
+P8_ONLINE     = $C5 ;Originally: P8.ONLINE
+P8_SETPREFX   = $C6 ;Originally: P8.SET.PREFIX
+P8_GETPREFX   = $C7 ;Originally: P8.GET.PREFIX
+P8_OPEN       = $C8 ;Originally: P8.OPEN
+P8_NEWLINE    = $C9 ;Originally: P8.NEWLINE
+P8_READ       = $CA ;Originally: P8.READ
+P8_WRITE      = $CB ;Originally: P8.WRITE
+P8_CLOSE      = $CC ;Originally: P8.CLOSE
+P8_FLUSH      = $CD ;Originally: P8.FLUSH
+P8_SET_MARK   = $CE ;Originally: P8.SET.MARK
+P8_GET_MARK   = $CF ;Originally: P8.GET.MARK
+P8_SET_EOF    = $D0 ;Originally: P8.SET.EOF
+P8_GET_EOF    = $D1 ;Originally: P8.GET.EOF
+P8_SET_BUF    = $D2 ;Originally: P8.SET.BUF
+P8_GET_BUF    = $D3 ;Originally: P8.GET.BUF
+; End of ProDOS8-MLI-Functions
+*TAG
+;==============================================================
+
+
+;==============================================================
+; Page 192 ($C0) Equates
+;==============================================================
+; Hardware I/O Locations & Soft Switches
+;==============================================================
+IOADR       = $C000 ;Hardware I/O Addresses & Soft Switches
+;--------------------------------------------------------------
+KEYBOARD    @ $C000 ;~($C00X)[R] Keyboard Input Register
+KBD         @ $C000 ;~($C00X)[R] Keyboard Input Register
+;KBD          $C000 ;(KBD)=[(Last Keypress)+(128)]=(KBD>128)
+SLOTROM     @ $C006 ;Not Apple II Plus; Used in New IIe ROMs
+INTROM      @ $C007 ;Not Apple II Plus; Used in New IIe ROMs
+KBDSTRB     @ $C010 ;~($C01X)[W] Clear KBD Strobe (KBD<128)
+TAPEOUT     @ $C020 ;~($C02X)[R] Toggle Cassette Data Output
+SPKR        @ $C030 ;~($C03X)[R/W] Toggle Speaker Data Output
+STROBE      @ $C040 ;~($C04X) Output Game Socket Strobe Pulse
+;--------------------------------------------------------------
+; These labels were as they are here in other earlier souces!
+; Therefore, It would not be true to say: "*" renamed from
+; "SW_*", nor renamed from Bob Sander-Cederlof's "SW.*"!
+TXTCLR      @ $C050 ;[R/W] Set Graphics Display Mode
+TXTSET      @ $C051 ;[R/W] Set Text Only Display Mode
+MIXCLR      @ $C052 ;[R/W] Set Full Screen Graphics/Text Mode
+MIXSET      @ $C053 ;[R/W] Set Mixed Graphics & Text Mode
+TXTPAGE1    @ $C054 ;[R/W] Display Text Page1 (R/W Main V-RAM)
+TXTPAGE2    @ $C055 ;[R/W] Display Text Page2 (R/W Aux V-RAM)
+LORES       @ $C056 ;[R/W] Reset HiRes Mode to LoRes/Text Mode
+HIRES       @ $C057 ;[R/W] Reset LoRes/Text Mode to HiRes Mode
+;==============================================================
+; Enable the choice you like best below (remove semicolons) and
+; Disable the other two of the three choices (add semicolons):
+;==============================================================
+; Uncorrected Annunciator Labels               [1 of 3 Choices]
+; [See: Tech Info Library Article No. 1062: Apple II Hardware:
+;       Errata in Apple II Reference Manual (Part 2 of 2)]
+;--------------------------------------------------------------
+;SETAN0     @ $C058 ;[R/W] * Set AN0: Toggle OFF (0VDC): WRONG!
+;CLRAN0     @ $C059 ;[R/W] Reset AN0: Toggle ON (+5VDC): WRONG!
+;SETAN1     @ $C05A ;[R/W] * Set AN1: Toggle OFF (0VDC): WRONG!
+;CLRAN1     @ $C05B ;[R/W] Reset AN1: Toggle ON (+5VDC): WRONG!
+;SETAN2     @ $C05C ;[R/W] * Set AN2: Toggle OFF (0VDC): WRONG!
+;CLRAN2     @ $C05D ;[R/W] Reset AN2: Toggle ON (+5VDC): WRONG!
+;SETAN3     @ $C05E ;[R/W] * Set AN3: Toggle OFF (0VDC): WRONG!
+;CLRAN3     @ $C05F ;[R/W] Reset AN3: Toggle ON (+5VDC): WRONG!
+;==============================================================
+; Corrected Annunciator Labels                 [2 of 3 Choices]
+; [See: Tech Info Library Article No. 1062: Apple II Hardware:
+;       Errata in Apple II Reference Manual (Part 2 of 2)]
+;--------------------------------------------------------------
+;CLRAN0     @ $C058 ;[R/W] Reset AN0: Toggle OFF (0VDC)
+;SETAN0     @ $C059 ;[R/W] * Set AN0: Toggle ON (+5VDC)
+;CLRAN1     @ $C05A ;[R/W] Reset AN1: Toggle OFF (0VDC)
+;SETAN1     @ $C05B ;[R/W] * Set AN1: Toggle ON (+5VDC)
+;CLRAN2     @ $C05C ;[R/W] Reset AN2: Toggle OFF (0VDC)
+;SETAN2     @ $C05D ;[R/W] * Set AN2: Toggle ON (+5VDC)
+;CLRAN3     @ $C05E ;[R/W] Reset AN3: Toggle OFF (0VDC)
+;SETAN3     @ $C05F ;[R/W] * Set AN3: Toggle ON (+5VDC)
+;==============================================================
+; Renamed Corrected Annunciator Labels         [3 of 3 Choices]
+; [See: Tech Info Library Article No. 1062: Apple II Hardware:
+;       Errata in Apple II Reference Manual (Part 2 of 2)]
+;--------------------------------------------------------------
+AN0OFF      @ $C058 ;[R/W] CLRAN0: Reset AN0: Toggle OFF (0VDC)
+AN0ON       @ $C059 ;[R/W] SETAN0: * Set AN0: Toggle ON (+5VDC)
+AN1OFF      @ $C05A ;[R/W] CLRAN1: Reset AN1: Toggle OFF (0VDC)
+AN1ON       @ $C05B ;[R/W] SETAN1: * Set AN1: Toggle ON (+5VDC)
+AN2OFF      @ $C05C ;[R/W] CLRAN2: Reset AN2: Toggle OFF (0VDC)
+AN2ON       @ $C05D ;[R/W] SETAN2: * Set AN2: Toggle ON (+5VDC)
+AN3OFF      @ $C05E ;[R/W] CLRAN3: Reset AN3: Toggle OFF (0VDC)
+AN3ON       @ $C05F ;[R/W] SETAN3: * Set AN3: Toggle ON (+5VDC)
+;==============================================================
+TAPEIN      @ $C060 ;+($C068)[R] Cassette Data Input
+;--------------------------------------------------------------
+PB0         @ $C061 ;+($C069)[R] Paddle 0 Pushbutton Switch
+PB1         @ $C062 ;+($C06A)[R] Paddle 1 Pushbutton Switch
+PB2         @ $C063 ;+($C06B)[R] Paddle 2 Pushbutton Switch
+PADDL0      @ $C064 ;+($C06C)[R] Paddle 0 Analog Input
+PADDL1      @ $C065 ;+($C06D)[R] Paddle 1 Analog Input
+PADDL2      @ $C066 ;+($C06E)[R] Paddle 2 Analog Input
+PADDL3      @ $C067 ;+($C06F)[R] Paddle 3 Analog Input
+PTRIG       @ $C070 ;~($C07X)[R/W] Reset All Paddles Trigger
+;--------------------------------------------------------------
+; Integrated WOZ Machine (IWM) I/O Locations & Soft Switches
+;--------------------------------------------------------------
+IWMPH0OFF   @ $C080 ;Stepper Motor Control
+;IWMPH0OFF  @ $C080 ;Originally: IWM_PH0_OFF   [McFadden Label]
+IWMPH0ON    @ $C081 ;Stepper Motor Control
+;IWMPH0ON   @ $C081 ;Originally: IWM_PH0_ON    [McFadden Label]
+IWMMOTORON  @ $C089 ;Starts Drive Motor Spinning
+;IWMMOTORON @ $C089 ;Originally: IWM_MOTOR_ON  [McFadden Label]
+IWMSELDRV1  @ $C08A ;Selects Drive 1
+;IWMSELDRV1 @ $C08A ;Originally: IWM_SEL_DRIVE_1 [McFadden Lbl]
+IWMQ6OFF    @ $C08C ;Read                                   [?]
+;IWMQ6OFF   @ $C08C ;Originally: IWM_Q6_OFF    [McFadden Label]
+IWMQ7OFF    @ $C08E ;Write Protect Sense/Read               [?]
+;IWMQ7OFF   @ $C08E ;Originally: IWM_Q7_OFF    [McFadden Label]
+;==============================================================
+
+
+;==============================================================
+; Page 198 ($C6) Equates
+;==============================================================
+SLOT6     @ $C600 ;Slot 6 Address Space (SLOT6) = $C600-$C6FF
+;SLOT6    @ $C600 ;AKA: SLOT6 = SLOT6ROM = DISK2ROM
+;--------------------------------------------------------------
+; In the Apple II Plus ROM image, this Slot 6 address space
+; is a copy (or vice-versa) of the $B600-$B6FF address space.
+; These labels do not need to be listed twice, so they are
+; only listed here (with $C6 addresses), not above.
+;==============================================================
+; Disk II Controller Card ROM (BOOT0 Code)* [Internal Equates]
+; * Reads BOOT1 code from track 0, sector 0, then jumps to it.
+;--------------------------------------------------------------
+*Tag Slot6-Disk-II-Controller-Card-ROM-(BOOT0-Code)
+DISK2ROM  @ $C600 ;$20/$00/$03 <- Disk II Controller Signature
+MKDCTBL   @ $C606 ;Make Decoder/Conversion Table Loop
+CHKDBL0S  @ $C614 ;Check for Double Zeroes Loop
+REJECT    @ $C61E ;Get next Decoder/Conversion Table candidate?
+FINDT0S0  @ $C63D ;Find Track Zero & Sector Zero Loop
+RDSECT    @ $C65C ;Find Sector to Read; Outer Loop
+RDSECT0   @ $C65D ;Find Data; Rentry for Correct T/S found
+RDSECT1   @ $C65E ;Wait for a Byte Loop
+RDSECT2   @ $C663 ;Find #$D5 Byte Loop
+RDSECT3   @ $C667 ;Find #$AA Byte Loop
+RDSECT4   @ $C671 ;Find #$96 Byte Loop
+RDSAD     @ $C683 ;Read Sector Address Data; Entry Point
+; SAD: Four 4+4 encoded fields: Volume, Track, Sector, Cecksum
+RDSAD1    @ $C685 ;Found Sector Address Loop
+RDSAD2    @ $C687 ;Get/Save Sector Address Header Loop
+RDSAD3    @ $C68F ;Read Sector Address Data Part 2 Loop
+;RDSAD3   @ $C68F ;Wait for a Byte Loop
+RDF62ESD  @ $C6A6 ;Read Found 6+2 Encoded Sector Data; Entry Pt
+RDTWOS    @ $C6A8 ;Read Twos Loop: 86 Data Bytes to $0300-$0355
+RDSIXES   @ $C6BA ;Read Sixes Loop: Each has 3*2 bits, encoded
+RDSIXES1  @ $C6BC ;Wait for a Byte Loop
+RDCHKSUM  @ $C6CB ;Read Checksum Byte Loop
+;RDCHKSUM @ $C6CB ;Wait for a Byte Loop
+RDF62ESDX @ $C6D3 ;Check if Checksum Byte = A-Reg Byte
+DCD62ENC  @ $C6D7 ;Decode 6+2 Encoding; Outer Loop
+DCD62ENC1 @ $C6D9 ;Decode 6+2 Encoding; Inner Loop
+;End of Slot6-Disk-II-Controller-Card-ROM-(BOOT0-Code)
+*Tag
+;==============================================================
+
+
+;==============================================================
+; Pages 200-207 ($C8-$CF) Equates
+;==============================================================
+; All Peripheral Card Slots' Shared $C800-$CFFF Memory Space
+;--------------------------------------------------------------
+*Tag All-Peripheral-Card-Slots
+ALLSLTMEM   @ $C800 ;~$CFFF: ROM/RAM Memory Space for All Slots
+SLOT_VTAB   @ $CDFE ;                                       [?]
+SLOT_GOERR  @ $CF53 ;                                       [?]
+CLRROM      @ $CFFF ;Tell slots to disable their extension ROM
+;End of All-Peripheral-Card-Slots
+*Tag
+;==============================================================
+
+
+;==============================================================
+; Pages 208-223 ($D0-$DF) Equates
+;==============================================================
+; Applesoft Tokens (107)
+;--------------------------------------------------------------
+; Also known as "Machine-Language Codes" for Applesoft BASIC
+; Keywords, Statements, and (Math, String, & other types of)
+; Functions.  (Applesoft-Tokens: Count = 107.)
+;--------------------------------------------------------------
+; Constants   = $nn ;Constants are NOT Zero Page Equates
+; TOK_*       = $nn ;Originally: TOKEN.*
+;--------------------------------------------------------------
+*TAG Applesoft-Tokens
+TOK_END       = $80 ;Token: "END" Program Control Statement
+TOK_FOR       = $81 ;Token: "FOR" Program Control Statement
+TOK_NEXT      = $82 ;Token: "NEXT" Program Control Statement
+TOK_DATA      = $83 ;Token: "DATA" Data Assignment Statement
+TOK_INPUT     = $84 ;Token: "INPUT" Input Statement
+TOK_DEL       = $85 ;Token: "DEL" Prgrm-Lines Removal Statement
+TOK_DIM       = $86 ;Token: "DIM" Assignment Statement
+TOK_READ      = $87 ;Token: "READ" Data Input Statement
+TOK_GR        = $88 ;Token: "GR" Graphics Display Statement
+TOK_TEXT      = $89 ;Token: "TEXT" Text Display Statement
+TOK_PR        = $8A ;Token: "PR#" Set Output Statement
+TOK_IN        = $8B ;Token: "IN#" Set Input Statement
+TOK_CALL      = $8C ;Token: "CALL" Program Control Statement
+TOK_PLOT      = $8D ;Token: "PLOT" Graphics Drawing Statement
+TOK_HLIN      = $8E ;Token: "HLIN" Graphics Drawing Statement
+TOK_VLIN      = $8F ;Token: "VLIN" Graphics Drawing Statement
+TOK_HGR2      = $90 ;Token: "HGR2" Graphics Display Statement
+TOK_HGR       = $91 ;Token: "HGR" Graphics Display Statement
+TOK_HCOLOR    = $92 ;Token: "HCOLOR=" Assignment Statement
+TOK_HPLOT     = $93 ;Token: "HPLOT" Graphics Drawing Statement
+TOK_DRAW      = $94 ;Token: "DRAW" Graphics Drawing Statement
+TOK_XDRAW     = $95 ;Token: "XDRAW" Graphics Drawing Statement
+TOK_HTAB      = $96 ;Token: "HTAB" Cursor Position Statement
+TOK_HOME      = $97 ;Token: "HOME" Text Display Statement
+TOK_ROT       = $98 ;Token: "ROT=" Assignment Statement
+TOK_SCALE     = $99 ;Token: "SCALE=" Assignment Statement
+TOK_SHLOAD    = $9A ;Token: "SHLOAD" Data Input Statement
+TOK_TRACE     = $9B ;Token: "TRACE" Debugging ON Statement
+TOK_NOTRACE   = $9C ;Token: "NOTRACE" Debugging OFF Statement
+TOK_NORMAL    = $9D ;Token: "NORMAL" Text Display Statement
+TOK_INVERSE   = $9E ;Token: "INVERSE" Text Display Statement
+TOK_FLASH     = $9F ;Token: "FLASH" Text Display Statement
+TOK_COLOR     = $A0 ;Token: "COLOR=" Assignment Statement
+TOK_POP       = $A1 ;Token: "POP" Program Control Statement
+TOK_VTAB      = $A2 ;Token: "VTAB" Cursor Position Statement
+TOK_HIMEM     = $A3 ;Token: "HIMEM:" Assignment Statement
+TOK_LOMEM     = $A4 ;Token: "LOMEM:" Assignment Statement
+TOK_ONERR     = $A5 ;Token: "ONERR" Program Control Statement
+TOK_RESUME    = $A6 ;Token: "RESUME" Program Control Statement
+TOK_RECALL    = $A7 ;Token: "RECALL" Arrays from Tape Statement
+TOK_STORE     = $A8 ;Token: "STORE" Arrays to Tape Statement
+TOK_SPEED     = $A9 ;Token: "SPEED=" Assignment Statement
+TOK_LET       = $AA ;Token: "LET" Assignment Statement
+TOK_GOTO      = $AB ;Token: "GOTO" Program Control Statement
+TOK_RUN       = $AC ;Token: "RUN" Program Control Statement
+TOK_IF        = $AD ;Token: "IF" Conditional Statement
+TOK_RESTORE   = $AE ;Token: "RESTORE" Data Reset Statement
+TOK_AMPER     = $AF ;Token: "&" (Ampersand) User-Cmd. Statement
+TOK_GOSUB     = $B0 ;Token: "GOSUB" Program Control Statement
+TOK_RETURN    = $B1 ;Token: "RETURN" Program Control Statement
+TOK_REM       = $B2 ;Token: "REM" Prgrm-Documentation Statement
+TOK_STOP      = $B3 ;Token: "STOP" Program Control Statement
+TOK_ON        = $B4 ;Token: "ON" Program Control Statement
+TOK_WAIT      = $B5 ;Token: "WAIT" Program Control Statement
+TOK_LOAD      = $B6 ;Token: "LOAD" Programs from Tape Statement
+TOK_SAVE      = $B7 ;Token: "SAVE" Programs to Tape Statement
+TOK_DEF       = $B8 ;Token: "DEF" Function Assignment Statement
+TOK_POKE      = $B9 ;Token: "POKE" Set Memory Address Function
+TOK_PRINT     = $BA ;Token: "PRINT" Output Statement
+TOK_CONT      = $BB ;Token: "CONT" Statement
+TOK_LIST      = $BC ;Token: "LIST" Pgm-Lines Display Statement
+TOK_CLEAR     = $BD ;Token: "CLEAR" Reset Everything Statement
+TOK_GET       = $BE ;Token: "GET" Input Statement
+TOK_NEW       = $BF ;Token: "NEW" Program Creation Statement
+TOK_TAB       = $C0 ;Token: "TAB(" Cursor Position Statement
+TOK_TO        = $C1 ;Token: "TO" Program Control Statement
+TOK_FN        = $C2 ;Token: "FN" Function Assignment Statement
+TOK_SPC       = $C3 ;Token: "SPC(" Cursor Position Statement
+TOK_THEN      = $C4 ;Token: "THEN" Conditional Statement
+TOK_AT        = $C5 ;Token: "AT" Graphics Drawing Statement
+TOK_NOT       = $C6 ;Token: "NOT" Conditional Statement
+TOK_STEP      = $C7 ;Token: "STEP" Conditional Statement
+TOK_PLUS      = $C8 ;Token: "+" (Plus) Math Function
+TOK_MINUS     = $C9 ;Token: "-" (Minus) Math Function
+TOK_MULT      = $CA ;Token: "*" (Multiply) Math Function
+TOK_DIV       = $CB ;Token: "/" (Division) Math Function
+TOK_EXPOP     = $CC ;Token: "^" (Exponent) Math Function
+TOK_AND       = $CD ;Token: "AND" Conditional Statement
+TOK_OR        = $CE ;Token: "OR" Conditional Statement
+TOK_GREATER   = $CF ;Token: ">" (Greater Than) Cond. Statement
+TOK_EQUAL     = $D0 ;Token: "=" (Equal To) Cond. Statement
+TOK_LESSER    = $D1 ;Token: "<" (Less Than) Cond. Statement
+TOK_SGN       = $D2 ;Token: "SGN" Math Function
+TOK_INT       = $D3 ;Token: "INT" Math Function
+TOK_ABS       = $D4 ;Token: "ABS" Math Function
+TOK_USR       = $D5 ;Token: "USR" User-Command Statement
+TOK_FRE       = $D6 ;Token: "FRE" Free Memory Statement
+TOK_SCRN      = $D7 ;Token: "SCRN(" LoRes (X,Y) Color Statement
+TOK_PDL       = $D8 ;Token: "PDL" Input Statement
+TOK_POS       = $D9 ;Token: "POS" Get Cursor Position Statement
+TOK_SQR       = $DA ;Token: "SQR" Math Function
+TOK_RND       = $DB ;Token: "RND" Math Function
+TOK_LOG       = $DC ;Token: "LOG" Math Function
+TOK_EXP       = $DD ;Token: "EXP" Math Function
+TOK_COS       = $DE ;Token: "COS" Math Function
+TOK_SIN       = $DF ;Token: "SIN" Math Function
+TOK_TAN       = $E0 ;Token: "TAN" Math Function
+TOK_ATN       = $E1 ;Token: "ATN" Math Function
+TOK_PEEK      = $E2 ;Token: "PEEK" Read Memory Address Function
+TOK_LEN       = $E3 ;Token: "LEN" String Length Function
+TOK_STR       = $E4 ;Token: "STR$" String Function
+TOK_VAL       = $E5 ;Token: "VAL" String Conversion Function
+TOK_ASC       = $E6 ;Token: "ASC" String Conversion Function
+TOK_CHR       = $E7 ;Token: "CHR$" String Function
+TOK_LEFT      = $E8 ;Token: "LEFT$" String Function
+TOK_RIGHT     = $E9 ;Token: "RIGHT$" String Function
+TOK_MID       = $EA ;Token: "MID$" String Function
+; End of Applesoft-Tokens
+*TAG
+;--------------------------------------------------------------
+TKADTBL     @ $D000 ;Applesoft Tokens Branch Address Table
+;TKADTBL    @ $D000 ;Originally: TOKEN.ADDRESS.TABLE; CMDTABL
+TKADTBLL    @ $D000 ;Applesoft Token Address Table, Low
+TKADTBLH    @ $D001 ;Applesoft Token Address Table, High
+;--------------------------------------------------------------
+UNFNC       @ $D080 ;Unary Functions Branch Address Table
+;==============================================================
+; Applesoft Math Operator Precedence Codes (AKA: Token Codes)
+; Constants   = $nn ;Constants are NOT Zero Page Equates
+;--------------------------------------------------------------
+P_OR          = $46 ;Math Operator: "OR"  Precedence Code
+P_AND         = $50 ;Math Operator: "AND" Precedence Code
+P_REL         = $64 ;Math Operator: "REL" Precedence Code
+P_ADD         = $79 ;Math Operator: "ADD" Precedence Code
+P_MUL         = $7B ;Math Operator: "MUL" Precedence Code
+P_PWR         = $7D ;Math Operator: "PWR" Precedence Code
+P_NEQ         = $7F ;Math Operator: "NEQ" Precedence Code
+;--------------------------------------------------------------
+MATHTBL     @ $D0B2 ;Math Operator Branch Address Table
+M_NEG       @ $D0C7 ;Math Operator ">" Branch Address
+;M_NEG      @ $D0C7 ;Originally: M.NEG
+M_EQU       @ $D0CA ;Math Operator "=" Branch Address
+;M_EQU      @ $D0CA ;Originally: M.EQU
+M_REL       @ $D0CD ;Math Operator "<" Branch Address
+;M_REL      @ $D0CD ;Originally: M.REL
+;--------------------------------------------------------------
+TKNMTBL     @ $D0D0 ;Token Names Branch Address Table
+;TKNMTBL    @ $D0D0 ;Originally: TOK.NAME.TABLE
+;==============================================================
+; ERROR MESSAGES
+;--------------------------------------------------------------
+ERR_MSGS      @ $D260 ;Applesoft Error Messages Table
+;ERR_MSGS     @ $D260 ;Originally: ERROR.MESSAGES
+;--------------------------------------------------------------
+; ERR_MESSAGE   = $(*-ERR_MSGS)
+; Constants     = $nn ;Constants are NOT Zero Page Equates
+;--------------------------------------------------------------
+ERR_NOFOR       = $00 ;"?Next Without For" Error Index
+ERR_SYNTAX      = $10 ;"?Syntax" Error Index
+ERR_NOGOSUB     = $16 ;"?Return Without Gosub" Error Index
+ERR_NODATA      = $2A ;"?Out Of Data" Error Index
+ERR_ILLQTY      = $35 ;"?Illegal Quantity" Error Index
+ERR_OVERFLOW    = $45 ;"?Overflow" Error Index
+ERR_MEMFULL     = $4D ;"?Out Of Memory" Error Index
+ERR_UNDEFSTAT   = $5A ;"?Undef'd Statement" Error Index
+ERR_BADSUBS     = $6B ;"?Bad Subscript" Error Index
+ERR_REDIMD      = $78 ;"?Redim'd Array" Error Index
+ERR_ZERODIV     = $85 ;"?Division By Zero" Error Index
+ERR_ILLDIR      = $95 ;"?Illegal Direct" Error Index
+ERR_BADTYPE     = $A3 ;"?Type Mismatch" Error Index
+ERR_STRLONG     = $B0 ;"?String Too Long" Error Index
+ERR_FRMCPX      = $BF ;"?Formula Too Complex" Error Index
+ERR_CANTCONT    = $D2 ;"?Can't Continue" Error Index
+ERR_UNDEFFUNC   = $E0 ;"?Undef'd Function" Error Index
+;--------------------------------------------------------------
+; Not in Applesoft Error Messages Table:
+;--------------------------------------------------------------
+ERR_BADRESP     = $FE ;'Bad Response to Input' Error Code
+;--------------------------------------------------------------
+; ERROR MESSAGES (See ERR_MSGS above)
+;--------------------------------------------------------------
+NOFOR_ERR     @ $D260 ;"NEXT WITHOUT FOR" ERROR
+SYNTAX_ERR    @ $D270 ;"SYNTAX" ERROR
+NOGOSUB_ERR   @ $D276 ;"RETURN WITHOUT GOSUB" ERROR
+NODATA_ERR    @ $D28A ;"OUT OF DATA" ERROR
+ILLQTY_ERR    @ $D295 ;"ILLEGAL QUANTITY" ERROR
+OVERFLOW_ERR  @ $D2A5 ;"OVERFLOW" ERROR
+MEMFULL_ERR   @ $D2AD ;"OUT OF MEMORY" ERROR
+UNDEFSTAT_ERR @ $D2BA ;"UNDEF'D STATEMENT" ERROR
+BADSUBS_ERR   @ $D2CB ;"BAD SUBSCRIPT" ERROR
+REDIMD_ERR    @ $D2D8 ;"REDIM'D ARRAY" ERROR
+ZERODIV_ERR   @ $D2E5 ;"DIVISION BY ZERO" ERROR
+ILLDIR_ERR    @ $D2F5 ;"ILLEGAL DIRECT" ERROR
+BADTYPE_ERR   @ $D303 ;"TYPE MISMATCH" ERROR
+STRLONG_ERR   @ $D310 ;"STRING TOO LONG" ERROR
+FRMCPX_ERR    @ $D31F ;"FORMULA TOO COMPLEX" ERROR
+CANTCONT_ERR  @ $D332 ;"CAN'T CONTINUE" ERROR
+UNDEFFUNC_ERR @ $D340 ;"UNDEF'D FUNCTION" ERROR
+;--------------------------------------------------------------
+QT_ERROR      @ $D350 ;" ERROR" & BELL; Null-Terminated String
+QT_IN         @ $D358 ;" IN ";          Null-Terminated String
+QT_BREAK      @ $D35D ;"BREAK" & BELL;  Null-Terminated String
+;--------------------------------------------------------------
+ERR_EXTRA     @ $DCDF ;"?EXTRA IGNORED" (GET/INPUT) Error
+ERR_REENTRY   @ $DCEF ;"?REENTER" (INPUT) Error
+;==============================================================
+; Applesoft Routines
+;--------------------------------------------------------------
+GTFORPTR    @ $D365 ;(Buggy!) Get FOR/NEXT Pointer from STACK
+;GTFORPTR   @ $D365 ;Originally: GTFORPNT
+GFP_1       @ $D36A ;GTFORPNT .1: Loop-Back Reentry Point
+GFP_2       @ $D37F ;GTFORPNT .2: Branch-Forward Reentry Point
+GFP_3       @ $D38B ;GTFORPNT .3: Branch-Forward Reentry Point
+GFP_4       @ $D392 ;GTFORPNT .4: Branch-Fwd Reentry Pt. (RTS)
+;--------------------------------------------------------------
+MVBLKUP1    @ $D393 ;Move block of memory up, 1st Entry Point
+;MVBLKUP1   @ $D393 ;Originally: BLTU
+MVBLKUP2    @ $D39A ;Move block of memory up, 2nd Entry Point
+;MVBLKUP2   @ $D39A ;Originally: BLTU2
+MVBLKUP2_1  @ $D3B7 ;BLTU2 .1: Branch-Forward Reentry Point
+MVBLKUP2_2  @ $D3C3 ;BLTU2 .2: Loop-Back Reentry Point
+MVBLKUP2_3  @ $D3C7 ;BLTU2 .3: Branch-Forward Reentry Point
+MVBLKUP2_4  @ $D3CE ;BLTU2 .4: Branch-Forward Reentry Point
+;--------------------------------------------------------------
+CHKMEM      @ $D3D6 ;Assure STACK space for FOR/GOSUB/Exp-Eval
+;--------------------------------------------------------------
+REASON      @ $D3E3 ;Assure enough Arrays-to-Strings Free-Space
+REASON_1    @ $D3ED ;REASON .1: Branch-Forward Reentry Point
+REASON_2    @ $D3F1 ;REASON .2: Loop-Back Reentry Point
+REASON_3    @ $D3FC ;REASON .3: Loop-Back Reentry Point
+REASON_4    @ $D40F ;REASON .4: Branch-Fwd Reentry Point (RTS)
+;--------------------------------------------------------------
+MEMERR      @ $D410 ;Set X-Reg to "?Out Of Memory" Error Code
+ERROR       @ $D412 ;Error Handler: Print Error based on X-Reg
+ERROR_1     @ $D419 ;ERROR .1: Branch-Forward Reentry Point
+ERROR_2     @ $D41F ;ERROR .2: Loop-Back Reentry Point
+;--------------------------------------------------------------
+PRERRLINO   @ $D431 ;Print Error Line Number
+;PRERRLINO  @ $D431 ;Originally: PRINT.ERROR.LINNUM
+;--------------------------------------------------------------
+RESTART     @ $D43C ;Applesoft Warm Restart Entry Point
+;RESTART    @ $D43C ;Get here from MON by Ctrl-C/0G/3D0G/E003G
+;--------------------------------------------------------------
+NMBRDLN     @ $D45C ;Numbered Line Handler
+;NMBRDLN    @ $D45C ;Originally: NUMBERED.LINE
+NMBRDLN_1   @ $D49F ;Branch-Forward Reentry Point
+;NMBRDLN_1  @ $D49F ;Originally: NUMBERED.LINE .1
+NMBRDLN_2   @ $D4A7 ;Branch-Fwd & Loop-Back Reentry Point
+;NMBRDLN_2  @ $D4A7 ;Originally: NUMBERED.LINE .2
+;--------------------------------------------------------------
+PTNWLN      @ $D4B5 ;Put a New Line into the Program
+;PTNWLN     @ $D4B5 ;Originally: PUT.NEW.LINE
+PTNWLN_1    @ $D4D1 ;Branch-Forward Reentry Point
+;PTNWLN_1   @ $D4D1 ;Originally: PUT.NEW.LINE .1
+PTNWLN_2    @ $D4EA ;Loop-Back Reentry Point
+;PTNWLN_2   @ $D4EA ;Originally: PUT.NEW.LINE .2
+;--------------------------------------------------------------
+FIXLINKS    @ $D4F2 ;Reset all Variables & Forward Pointers
+;FIXLINKS   @ $D4F2 ;Originally: FIX.LINKS
+FIXLINKS_1  @ $D4FE ;Loop-Back Reentry Point
+;FIXLINKS_1 @ $D4F2 ;Originally: FIX.LINKS .1
+FIXLINKS_2  @ $D50F ;Branch-Forward Reentry Point
+;FIXLINKS_2 @ $D4F2 ;Originally: FIX.LINKS .2
+FIXLINKS_3  @ $D511 ;Loop-Back Reentry Point
+;FIXLINKS_3 @ $D4F2 ;Originally: FIX.LINKS .3
+;--------------------------------------------------------------
+INLIN       @ $D52C ;Read a line & strip off sign bits, Entry 1
+INLIN2      @ $D52E ;Read a line & strip off sign bits, Entry 2
+INLIN2_1    @ $D539 ;INLIN2 .1: Branch-Forward Reentry Point
+INLIN2_2    @ $D541 ;INLIN2 .2: Loop-Back Reentry Point
+INLIN2_3    @ $D54C ;INLIN2 .3: Branch-Forward Reentry Point
+;--------------------------------------------------------------
+INCHR       @ $D553 ;Read a character & strip off sign bits
+INCHR       @ $D553 ;KISS!: JSR MON.RDKEY could be BIT KBDSTRB
+;--------------------------------------------------------------
+PARSELINE   @ $D559 ;Tokenize the Input Line, 1st Entry Point
+;PARSELINE  @ $D559 ;Originally: PARSE.INPUT.LINE
+PARSE       @ $D56C ;Tokenize the Input Line, 2nd Entry Point
+PARSE_1     @ $D56D ;PARSE .1: Loop-Back Reentry Point
+PARSE_2     @ $D578 ;PARSE .2: Branch-Forward Reentry Point
+PARSE_3     @ $D588 ;PARSE .3: Branch-Forward Reentry Point
+PARSE_4     @ $D590 ;PARSE .4: Branch-Forward Reentry Point
+PARSE_5     @ $D5A2 ;PARSE .5: Loop-Back Reentry Point
+PARSE_6     @ $D5A7 ;PARSE .6: Brnch-Fwd & Loop-Back Reentry Pt
+PARSE_7     @ $D5A8 ;PARSE .7: Loop-Back Reentry Point
+PARSE_8     @ $D5CB ;PARSE .8: Brnch-Fwd & Loop-Back Reentry Pt
+PARSE_9     @ $D5CD ;PARSE .9: Brnch-Fwd & Loop-Back Reentry Pt
+PARSE_10    @ $D5E0 ;PARSE .10: Branch-Forward Reentry Point
+PARSE_11    @ $D5E2 ;PARSE .11: Branch-Forward Reentry Point
+PARSE_12    @ $D5E9 ;PARSE .12: Loop-Back Reentry Point
+PARSE_13    @ $D5F2 ;PARSE .13: Branch-Forward Reentry Point
+PARSE_14    @ $D5F9 ;PARSE .14: Branch-Forward Reentry Point
+PARSE_15    @ $D5FD ;PARSE .15: Loop-Back Reentry Point
+PARSE_16    @ $D604 ;PARSE .16: Branch-Forward Reentry Point
+PARSE_17    @ $D610 ;PARSE .17: Branch-Forward Reentry Point
+;--------------------------------------------------------------
+FNDLIN      @ $D61A ;Search for Line# (from Start of Program)
+FL1         @ $D61E ;FNDLIN: Loop-Back Always Reentry Point
+FL1_1       @ $D635 ;FNDLIN .1: Branch-Forward Reentry Point
+FL1_2       @ $D63E ;FNDLIN .2: Branch-Forward Reentry Point
+FL1_3       @ $D647 ;FNDLIN .3: Branch-Forward Reentry Point
+RTS_1       @ $D648 ;FNDLIN: Branch-Fwd/Back Entry Point (RTS)
+;RTS_1      @ $D648 ;RTS.1: Return to Caller #1
+;--------------------------------------------------------------
+NEW         @ $D649 ;NEW Statement; RTS1 if more to Statement
+SCRTCH      @ $D64B ;NEW Statement; No more to it, so do it!
+SETPTRS     @ $D665 ;JSR STXTPT: Reset TXTPTR to TXTTAB-1, SoP
+;--------------------------------------------------------------
+CLEAR       @ $D66A ;CLEAR Statement; RTS2 if NOT at Stmnt End
+CLEARC      @ $D66C ;CLEAR Statement; NOT at End, so do it!
+STKINI      @ $D683 ;Reset/Initialize STACK to start at $01F8
+RTS_2       @ $D696 ;Branch-Forward/Backward Entry Point (RTS)
+;RTS_2      @ $D696 ;RTS.2: Return to Caller #2
+;--------------------------------------------------------------
+CLRTXTPTR   @ $D697 ;Reset TXTPTR to TXTTAB-1, Start of Program
+;CLRTXTPTR  @ $D697 ;Originally: STXTPT
+;--------------------------------------------------------------
+BAS_LIST    @ $D6A5 ;LIST Statement, Applesoft BASIC
+;BAS_LIST   @ $D6A5 ;Originally: LIST & .1/.2/.3 below
+BAS_LIST_1  @ $D6B1 ;LIST .1: Branch-Forward Reentry Point
+BAS_LIST_2  @ $D6C4 ;LIST .2: Branch-Forward Reentry Point
+BAS_LIST_3  @ $D6CC ;LIST .3: Branch-Forward Reentry Point
+BAS_LIST0   @ $D6DA ;Branch-Forward & Loop-Back Reentry Point
+;BAS_LIST0  @ $D6DA ;Originally: LIST.0 & .5/.6 below
+BAS_LIST0_5 @ $D6F5 ;LIST.0 .5: Range Done; Br-Fwd Reentry Pt
+;------------------- List One Line ----------------------------
+BAS_LIST0_6 @ $D6F7 ;LIST.0 .6: Branch-Forward Reentry Point
+BAS_LIST1   @ $D6FE ;LIST.1: Loop-Back Reentry Point
+;BAS_LIST1  @ $D6FE ;Originally: LIST.1
+BAS_LIST2   @ $D702 ;LIST.2: Loop-Back Reentry Point
+;BAS_LIST2  @ $D702 ;Originally: LIST.2 & .1 below
+BAS_LIST2_1 @ $D712 ;LIST.2 .1: Branch-Forward Reentry Point
+BAS_LIST3   @ $D724 ;LIST.3: Branch-Forward Reentry Point
+;BAS_LIST3  @ $D724 ;Originally: LIST.3
+;--------------------------------------------------------------
+GETCHR      @ $D72C ;Get character from table; Pointer is (FAC)
+GETCHR1     @ $D731 ;Branch-Forward Reentry Point
+;GETCHR1    @ $D731 ;Originally: GETCHR .1
+;--------------------------------------------------------------
+BAS_LIST4   @ $D734 ;LIST.4: Branch-Fwd Reentry Point
+;BAS_LIST4  @ $D734 ;Originally: LIST.4 & .1/.2/.3/.4/.5 below
+BAS_LIST4_1 @ $D746 ;LIST.4 .1: Loop-Back Reentry Point
+BAS_LIST4_2 @ $D749 ;LIST.4 .2: Loop-Back Reentry Point
+BAS_LIST4_3 @ $D750 ;LIST.4 .3: Branch-Forward Reentry Point
+BAS_LIST4_4 @ $D755 ;LIST.4 .4: Loop-Back Reentry Point
+BAS_LIST4_5 @ $D75F ;LIST.4 .5: Branch-Forward Reentry Point
+;--------------------------------------------------------------
+FOR         @ $D766 ;FOR Statement; Pushes 18 bytes onto STACK
+FOR_1       @ $D777 ;FOR .1: Branch-Forward Reentry Point
+;--------------------------------------------------------------
+STEP        @ $D7AF ;STEP Keyword of FOR Statement
+STEP_1      @ $D7C3 ;STEP .1: Branch-Forward Reentry Point
+;--------------------------------------------------------------
+NEWSTT      @ $D7D2 ;Execute NEXT Statement (of FOR Statement)
+NEWSTT_1    @ $D7E5 ;NEWSTT .1: Branch-Forward Reentry Point
+NEWSTT_2    @ $D805 ;NEWSTT .2: Branch-Forward Reentry Point
+;--------------------------------------------------------------
+TRACEQ      @ $D805 ;Is Debugging On?  Is the Program Running?
+;TRACEQ     @ $D805 ;Originally: TRACE.<-(dot)
+;TRACEQ_1   @ $D81D ;TRACE. .1: Branch-Forward Reentry Point
+TRACEQ_1    @ $D81D ;TRACE. .1: No, so do not TRACE
+;--------------------------------------------------------------
+GOEND       @ $D826 ;BEQ END4; Br-Fwd Reentry & Br-Fwd More Pt
+;--------------------------------------------------------------
+EXECSTMNT   @ $D828 ;Execute a Statement, 1st Entry Point
+;EXECSTMNT  @ $D828 ;Originally: EXECUTE.STATEMENT
+EXECSTMNT1  @ $D82A ;Execute a Statement, 2nd Entry Point
+;EXECSTMNT1 @ $D82A ;Originally: EXECUTE.STATEMENT.1
+EXECSTMNT2  @ $D83F ;Branch-Forward Reentry Point
+;EXECSTMNT2 @ $D83F ;Originally: EXECUTE.STATEMENT.1 .1
+;--------------------------------------------------------------
+COLONQ      @ $D842 ;Is A-Reg a Colon (:)?  Yes, do TRACEQ
+;COLONQ     @ $D842 ;Originally: COLON.<-(dot)
+SYNERR1     @ $D846 ;SYNERR.1: No, do SYNTAX ERROR
+;--------------------------------------------------------------
+A_RESTORE   @ $D849 ;RESTORE Statement; Originally: RESTORE
+BAS_RESTORE @ $D849 ;RESTORE Statement; Originally: RESTORE
+SETDA       @ $D853 ;Set DATPTR from (A-Reg,Y-Reg)~(Low,High)
+RTS3        @ $D857 ;RTS.3: Return to Caller #3
+;--------------------------------------------------------------
+ISCTRLC     @ $D858 ;See if Control-C was typed
+ISCTRLC1    @ $D860 ;ISCNTC .1: Branch-Forward Reentry Point
+CTRLCTYPD   @ $D863 ;Control-C was typed
+;CTRLCTYPD  @ $D863 ;Originally: CONTROL.C.TYPED
+CTRLCTYPD2  @ $D86C ;ISCNTC .2: Branch-Forward Reentry Point
+;CTRLCTYPD2 @ $D86C ;Originally: CONTROL.C.TYPED .2
+;--------------------------------------------------------------
+; NEEDS WORK:
+;--------------------------------------------------------------
+STOP        @ $D86E ;Originally: 
+END         @ $D870 ;Originally: 
+END2        @ $D871 ;Originally: 
+END2_1      @ $D888 ;Originally: 
+END4        @ $D88A ;Originally: 
+END4_1      @ $D893 ;Originally: 
+CONT        @ $D896 ;Originally: 
+CONT_1      @ $D8A1 ;Originally: 
+RTS_4       @ $D8AF ;Originally: 
+A_SAVE      @ $D8B0 ;Originally: 
+BAS_SAVE    @ $D8B0 ;Originally: 
+LOAD        @ $D8C9 ;Originally: 
+LOAD_1      @ $D8ED ;Originally: 
+VARTIO      @ $D8F0 ;Originally: 
+PROGIO      @ $D901 ;Originally: 
+RUN         @ $D912 ;Originally: 
+RUN_1       @ $D91B ;Originally: 
+GOSUB       @ $D921 ;Originally: 
+GO_TO_LINE  @ $D935 ;Originally: 
+GOTO        @ $D93E ;Originally: 
+GOTO_1      @ $D955 ;Originally: 
+GOTO_2      @ $D959 ;Originally: 
+RTS_5       @ $D96A ;Originally: 
+POP         @ $D96B ;Originally: 
+POPRTN      @ $D96B ;Originally: 
+NOGSBERR    @ $D979 ;Throw a "?Return Without Gosub" Error
+;NOGSBERR   @ $D979 ;Unused/Callable User-Only Entry Point
+UNDFSTERR   @ $D97C ;Throw an "?Undef'd Statement" Error
+;UNDFSTERR  @ $D97C ;Originally: UNDERR
+SYNERR2     @ $D981 ;(LpFrg Entry Pt): Throw a "?Syntax" Error
+;SYNERR2    @ $D981 ;Originally: SYNERR_2
+RETURN      @ $D984 ;Originally: 
+DATA        @ $D995 ;Originally: 
+ADDON       @ $D998 ;Originally: 
+ADDON_1     @ $D9A2 ;Originally: 
+RTS_6       @ $D9A2 ;Originally: 
+DATAN       @ $D9A3 ;Originally: 
+REMN        @ $D9A6 ;Originally: 
+REMN_1      @ $D9AE ;Originally: 
+REMN_2      @ $D9B6 ;Originally: 
+PULL3       @ $D9C5 ;Originally: 
+IF          @ $D9C9 ;Originally: 
+IF_1        @ $D9D8 ;Originally: 
+REM         @ $D9DC ;Originally: 
+IF_TRUE     @ $D9E1 ;Originally: 
+IF_TRUE_1   @ $D9E9 ;Originally: 
+ONGOTO      @ $D9EC ;Originally: 
+ONGO_1      @ $D9F4 ;Originally: ON.1
+ONGO_2      @ $D9F8 ;Originally: ON.2
+ONGO_3      @ $DA00 ;Originally: ONGOTO .3
+RTS_7       @ $DA0B ;Originally: 
+LINGET      @ $DA0C ;Originally: 
+LINGET_1    @ $DA12 ;Originally: 
+LINGET_2    @ $DA40 ;Originally: 
+LET         @ $DA46 ;Originally: 
+LET2        @ $DA63 ;Originally: 
+LET2_1      @ $DA77 ;Originally: 
+LETSTR      @ $DA7A ;Originally: LET.STRING
+PUTSTR      @ $DA7B ;Originally: 
+PUTSTR_1    @ $DA8C ;Originally: 
+PUTSTR_2    @ $DA9A ;Originally: 
+PUTSTR_3    @ $DAA1 ;Originally: 
+PUTSTR_4    @ $DAB7 ;Originally: 
+PRSTR       @ $DACF ;Originally: PR.STRING
+PRINT       @ $DAD5 ;Originally: 
+PRINT2      @ $DAD7 ;Originally: 
+CRDO        @ $DAFB ;Originally: 
+NEGATE      @ $DB00 ;Originally: 
+RTS_8       @ $DB02 ;Originally: 
+PRCOMMA     @ $DB03 ;Originally: PR.COMMA
+PRCOMMA_1   @ $DB0E ;Originally: PR.COMMA .1
+PRTABSPC    @ $DB16 ;Originally: PR.TAB.OR.SPC
+PRTABSPC_1  @ $DB21 ;Originally: PR.TAB.OR.SPC .1
+PRTABSPC_2  @ $DB2B ;Originally: PR.TAB.OR.SPC .2
+NXTSPC      @ $DB2C ;Originally: NXSPC
+PRNXTCHR    @ $DB2F ;Originally: PR.NEXT.CHAR
+DOSPC       @ $DB35 ;Originally: 
+STROUT      @ $DB3A ;Originally: 
+STRPRT      @ $DB3D ;Originally: 
+STRPRT_1    @ $DB44 ;Originally: 
+OUTSP       @ $DB57 ;Originally: 
+OUTQUES     @ $DB5A ;Originally: 
+OUTDO       @ $DB5C ;Originally: 
+OUTDO_1     @ $DB64 ;Originally: 
+INPUTERR    @ $DB71 ;Originally: 
+READERR     @ $DB7B ;Originally: 
+ERRLINE     @ $DB7F ;Originally: ERLIN
+INPERR      @ $DB86 ;Originally: 
+RESPERR     @ $DB87 ;Originally: 
+BADRESPERR  @ $DB8B ;'Bad Response to Input' User Entry Point
+RESPERR_1   @ $DB90 ;Originally: 
+GET         @ $DBA0 ;Originally: 
+INPUT       @ $DBB2 ;Originally: 
+INPUT_1     @ $DBC4 ;Originally: 
+INPUT_2     @ $DBC7 ;Originally: 
+NEXTIN      @ $DBDC ;Originally: NXIN
+A_READ      @ $DBE2 ;Originally: 
+BAS_READ    @ $DBE2 ;Originally: 
+INFLAG0     @ $DBE9 ;Originally: INFLAG.ZERO
+PRCSINLST   @ $DBEB ;Originally: PROCESS.INPUT.LIST
+PRCSINITM   @ $DBF1 ;Originally: PROCESS.INPUT.ITEM
+PRCSINITM_1 @ $DC1F ;Originally: PROCESS.INPUT.ITEM .1
+PRCSINITM_2 @ $DC27 ;Originally: PROCESS.INPUT.ITEM .2
+INSTART     @ $DC2B ;Originally: 
+INSTART_1   @ $DC3F ;Originally: 
+INSTART_2   @ $DC4B ;Originally: 
+INSTART_3   @ $DC4C ;Originally: 
+INSTART_4   @ $DC57 ;Originally: 
+INSTART_5   @ $DC63 ;Originally: 
+INDATA      @ $DC69 ;Originally: INPUT.DATA
+INMORE      @ $DC72 ;Originally: INPUT.MORE
+INMORE_1    @ $DC7E ;Originally: INPUT.MORE .1
+INPFIN      @ $DC99 ;Originally: 
+FINDATA     @ $DCA0 ;Originally: 
+FINDATA_1   @ $DCB9 ;Originally: 
+INPDONE     @ $DCC6 ;Originally: 
+INPDONE_1   @ $DCD1 ;Originally: 
+INPDONE_2   @ $DCDE ;Originally: 
+ERR_EXTRA   @ $DCDF ;"?EXTRA IGNORED" (GET/INPUT) Error
+ERR_REENTRY @ $DCEF ;"?REENTER" (INPUT) Error
+NEXT        @ $DCF9 ;Originally: 
+NEXT_1      @ $DCFF ;Originally: 
+NEXT_2      @ $DD02 ;Originally: 
+GERR        @ $DD0D ;Originally: 
+NEXT_3      @ $DD0F ;Originally: 
+NEXT_3_1    @ $DD52 ;Originally: 
+NEXT_3_2    @ $DD55 ;Originally: 
+;--------------------------------------------------------------
+FRMNUM      @ $DD67 ;Evaluate & Assure Expression is Numeric
+;FRMNUM     @ $DD67 ;call FRMEVL, confirm expr is numeric
+;FRMNUM     @ $DD67 ;Originally: BAS_FRMNUM
+CHKNUM      @ $DD6A ;Assure (FAC) type is Numeric (VALTYP=$00)
+CHKSTR      @ $DD6C ;Assure (FAC) type is String  (VALTYP=$FF)
+CHKVAL      @ $DD6D ;Assure (FAC) type is correct (String)
+CHKVAL_1    @ $DD73 ;CHKVAL: Type is correct, Return to caller
+CHKVAL_2    @ $DD74 ;CHKVAL: Type is String, Return to caller
+CHKVAL_3    @ $DD76 ;CHKVAL: Type is Bad, Type Mismatch Error
+JERROR      @ $DD78 ;CHKVAL: Jump to Error Handler
+;--------------------------------------------------------------
+FRMEVL      @ $DD7B ;Expression Format Evaluator
+;FRMEVL     @ $DD7B ;Evaluate EXP at TXTPTR, put result in FAC
+;FRMEVL     @ $DD7B ;Works for String & Numeric Expressions
+;FRMEVL     @ $DD7B ;Originally: BAS_FRMEVL
+
+FRMEVL_1    @ $DD81 ;FRMEVL: DEC TXTPTR, Low byte only!
+FRMEVL1     @ $DD86 ;FRMEVL1 Part 1: Prepare for Part 2
+FRMEVL2     @ $DD95 ;FRMEVL2 Part 2: Check for REL Operators
+FRMEVL2_1   @ $DD98 ;FRMEVL2 Part 2-1: Check for <,=,> again
+FRMEVL2_2   @ $DDB4 ;FRMEVL2 Part 2-2: Relational Operator?
+FRMEVL2_3   @ $DDC5 ;FRMEVL2 Part 2-3: Is NOT REL Operator!
+;--------------------------------------------------------------
+PREFTEST    @ $DDCD ;Check Form & Precedence Test
+;PREFTEST   @ $DDCD ;Originally: FRM.PRECEDENCE.TEST
+NXTOP       @ $DDD6 ;Form correct, Save Precedence on STACK
+SAVOP       @ $DDD7 ;Save rest of OP, call FRMEVL recursively
+;--------------------------------------------------------------
+FRMREL      @ $DDE4 ;Found one or more REL Operators <,=,>
+;FRMREL     @ $DDE4 ;Originally: FRM.RELATIONAL
+FRMREL1     @ $DDEE ;FRMREL: DEC TXTPTR, Low byte only!
+;FRMREL1    @ $DDEE ;Originally: FRM.RELATIONAL .1
+;FRMREL_END @ $DDF4 ;Always branch back to FRMPRETEST
+;--------------------------------------------------------------
+PREFNC      @ $DDF6 ;Originally: 
+FRM_RECURSE @ $DDFD ;Originally: 
+SNTXERR     @ $DE0D ;Originally: 
+FRM_STACK_1 @ $DE10 ;Originally: 
+FRM_STACK_2 @ $DE15 ;Originally: 
+FRM_STACK_3 @ $DE20 ;Originally: 
+NOTMATH     @ $DE35 ;Originally: 
+GOEX        @ $DE38 ;Originally: 
+FRMPRFRM1   @ $DE3A ;Originally: FRM.PERFORM.1
+FRMPRFRM1_1 @ $DE41 ;Originally: FRM.PERFORM.1 .1
+FRMPRFRM2   @ $DE43 ;Originally: FRM.PERFORM.2
+EXIT        @ $DE5D ;Originally: 
+FRMELMNT    @ $DE60 ;Originally: FRM.ELEMENT
+FRMELMNT1   @ $DE64 ;Originally: FRM.ELEMENT .1
+FRMELMNT2   @ $DE69 ;Originally: FRM.ELEMENT .2
+FRMELMNT3   @ $DE6C ;Originally: FRM.ELEMENT .3
+STRTXT      @ $DE81 ;Originally: 
+STRTXT_1    @ $DE8A ;Originally: 
+NOT_        @ $DE90 ;Originally: 
+EQUOP       @ $DE98 ;Originally: 
+EQUOP_1     @ $DE9F ;Originally: 
+FN_         @ $DEA4 ;Originally: FN_
+SGN_        @ $DEAB ;Originally: 
+PARCHK      @ $DEB2 ;Originally: 
+CHKCLS      @ $DEB8 ;Originally: 
+CHKOPN      @ $DEBB ;Originally: 
+CHKCOM      @ $DEBE ;Check TXTPTR for comma
+SYNCHR      @ $DEC0 ;Originally: 
+;--------------------------------------------------------------
+SYN_ERROR   @ $DEC9 ;Syntax Error
+SYNERR      @ $DEC9 ;Originally: 
+;--------------------------------------------------------------
+MIN         @ $DECE ;Originally: 
+EQUL        @ $DED0 ;Originally: 
+FRMVAR      @ $DED5 ;Evaluate a Variable
+;FRMVAR     @ $DED5 ;Originally: FRM.VARIABLE
+;FRMVAR     @ $DED5 ;HAB is used to Flag this JSR to PTRGET
+FRMVARCAL   @ $DED7 ;High Address Byte (HAB) of PTRGET ($DF)
+;FRMVARCAL  @ $DED7 ;Originally: FRM.VARIABLE.CALL
+;FRMVARCAL  @ $DED7 ;HAB is Flag: So PTRGET can tell we called
+FRMVAR1     @ $DEE5 ;Originally: FRM.VARIABLE .1
+FRMVAR2     @ $DEF6 ;Originally: FRM.VARIABLE .2
+BAS_SCREEN  @ $DEF9 ;Originally: 
+A_SCREEN    @ $DEF9 ;Originally: 
+UNARY       @ $DF0C ;Originally: 
+UNARY_1     @ $DF3A ;Originally: 
+UNARY_2     @ $DF3F ;Originally: 
+OR          @ $DF4F ;Originally: 
+AND         @ $DF55 ;Originally: 
+FALSE       @ $DF5D ;Originally: 
+TRUE        @ $DF60 ;Originally: 
+RELOPS      @ $DF65 ;Originally: 
+STRCMP      @ $DF7D ;Originally: 
+STRCMP_1    @ $DFA5 ;Originally: 
+STRCMP1     @ $DFAA ;Originally: 
+NUMCMP      @ $DFB0 ;Originally: 
+STRCMP2     @ $DFB5 ;Originally: 
+CMPDONE     @ $DFC1 ;Originally: 
+CMPDONE_1   @ $DFCA ;Originally: 
+PDL         @ $DFCD ;Originally: 
+NXDIM       @ $DFD6 ;Originally: 
+DIM         @ $DFD9 ;Originally: 
+PTRGET      @ $DFE3 ;Originally: 
+PTRGET2     @ $DFE8 ;Originally: 
+PTRGET3     @ $DFEA ;Originally: 
+BADNAM      @ $DFF4 ;Originally: 
+NAMOK       @ $DFF7 ;Originally: 
+;==============================================================
+
+
+;==============================================================
+; Pages 224-247 ($E0-$F7) Equates
+;==============================================================
+; Applesoft BASIC Entry Points
+;--------------------------------------------------------------
+BASIC       @ $E000 ;Applesoft Hard/Cold/Control-B Entry Point
+BASIC2      @ $E003 ;Applesoft Soft/Warm/Control-C Entry Point
+;--------------------------------------------------------------
+; Applesoft Routines
+;--------------------------------------------------------------
+ILLQ_ERROR  @ $E199 ;Illegal Quantity Error
+GETADR      @ $E752 ;Convert FAC to 2-byte integer in LINNUM
+GETBYT      @ $E6F8 ;Applesoft: Gets byte, in X/FACLO
+HFNS        @ $F6B9 ;Applesoft: Get Hi-Res X/Y for HPLOT
+;--------------------------------------------------------------
+; NEEDS WORK:
+;--------------------------------------------------------------
+PTRGET4     @ $E007 ;Originally: 
+PTRGET4_1   @ $E011 ;Originally: 
+PTRGET4_2   @ $E012 ;Originally: 
+PTRGET4_3   @ $E01C ;Originally: 
+PTRGET4_4   @ $E026 ;Originally: 
+PTRGET4_5   @ $E036 ;Originally: 
+PTRGET4_6   @ $E03D ;Originally: 
+PTRGET4_7   @ $E046 ;Originally: 
+PTRGET4_8   @ $E049 ;Originally: 
+PTRGET4_9   @ $E04F ;Originally: 
+PTRGET4_10  @ $E059 ;Originally: 
+PTRGET4_11  @ $E05B ;Originally: 
+PTRGET4_12  @ $E065 ;Originally: 
+PTRGET4_13  @ $E073 ;Originally: 
+ISLETC      @ $E07D ;Originally: 
+ISLETC_1    @ $E086 ;Originally: 
+NAME_NOT_FOUND             @ $E087 ;Originally: 
+C_ZERO      @ $E09A ;Integer or Real Zero, or Null String
+;C_ZERO     @ $E09A ;Originally: C.ZERO
+MAKE_NEW_VARIABLE          @ $E09C ;Originally: 
+MAKE_NEW_VARIABLE_1        @ $E0B2 ;Originally: 
+SETVARPTRYA @ $E0DE ;Originally: SET_VARPNT_AND_YA
+SETVARPTR   @ $E0E8 ;Originally: SETVARPNT_AND_YA_1
+GETARY      @ $E0ED ;Originally: 
+GETARY2     @ $E0EF ;Originally: 
+GETARY2_1   @ $E0F9 ;Originally: 
+;==============================================================
+NEG32768    @ $E0FE ;-32768.00049 in FAC/ARG               (6B)
+;--------------------------------------------------------------
+; Meant to be -32768, which would be $90 $80 $00 $00 $00 $80,
+; 2 bytes short, so picks up $20 $B1 from next instruction,
+; $90 $80 $00 $00 $20 $B1.
+;--------------------------------------------------------------
+; I read somewhere, long ago, that this was done to shave 2
+; bytes from the code, figuring that 0.00049 would be insignif-
+; icant in most calculations with this number, or that it would
+; be stripped off and used as the integer -32768, and that the
+; sign byte ($B1) is still negative with its most significant
+; bit (msb) set ($80 ~ $FF)--[$B1 (177) > $7F (127)]. -- [JPD]
+;==============================================================
+MAKINT      @ $E102 ;Originally: 
+MKINT       @ $E108 ;Originally: 
+AYINT       @ $E10C ;Originally: 
+MI1         @ $E119 ;Originally: 
+MI2         @ $E11B ;Originally: 
+ARRAY       @ $E11E ;Originally: 
+ARRAY_1     @ $E12C ;Originally: 
+ARRAY_2     @ $E169 ;Originally: 
+ARRAY_3     @ $E16D ;Originally: 
+ARRAY_4     @ $E179 ;Originally: 
+ARRAY_5     @ $E188 ;Originally: 
+SUBERR      @ $E196 ;Originally: 
+IQERR       @ $E199 ;Originally: 
+JER         @ $E19B ;Originally: 
+UOA         @ $E19E ;Originally: USE.OLD.ARRAY
+UOA_1       @ $E1AA ;Originally: USE.OLD.ARRAY_1
+MNA         @ $E1B8 ;Originally: MAKE.NEW.ARRAY
+MNA_1       @ $E1C1 ;Originally: MAKE.NEW.ARRAY_1
+MNA_2       @ $E1D5 ;Originally: MAKE.NEW.ARRAY_2
+MNA_3       @ $E1DE ;Originally: MAKE.NEW.ARRAY_3
+MNA_4       @ $E1E7 ;Originally: MAKE.NEW.ARRAY_4
+MNA_5       @ $E1F7 ;Originally: MAKE.NEW.ARRAY_5
+MNA_6       @ $E21A ;Originally: MAKE.NEW.ARRAY_6
+MNA_7       @ $E229 ;Originally: MAKE.NEW.ARRAY_7
+MNA_8       @ $E22E ;Originally: MAKE.NEW.ARRAY_8
+;FARYELM    @ $E24B ;The Faries' Home Tree on Avatar ;-D
+FARYELM     @ $E24B ;Originally: FIND.ARRAY.ELEMENT
+;FAE1       @ $E253 ;FAE1 looks too much like an address!
+FARYELM1    @ $E253 ;Originally: FAE.1
+GSE         @ $E269 ;Originally: 
+GME         @ $E26C ;Originally: 
+;FAE2       @ $E253 ;FAE2 looks too much like an address!
+FARYELM2    @ $E26F ;Originally: 
+;FAE3       @ $E253 ;FAE3 looks too much like an address!
+FARYELM3    @ $E270 ;Originally: FAE3
+FARYELM3_1  @ $E281 ;Originally: FAE3 .1
+FARYELM3_2  @ $E292 ;Originally: FAE3 .2
+FARYELM3_3  @ $E298 ;Originally: FAE3 .3
+RTS_9       @ $E2AC ;Originally: RTS.9
+MULTSUBS    @ $E2AD ;Originally: MULTIPLY.SUBSCRIPT
+MULTSUBS1   @ $E2B6 ;Originally: MULTIPLY.SUBS.1
+MULTSUBS1_1 @ $E2C0 ;Originally: MULTIPLY.SUBS.1 .1
+MULTSUBS1_2 @ $E2D9 ;Originally: MULTIPLY.SUBS.1 .2
+FRE         @ $E2DE ;Originally: 
+FRE_1       @ $E2E5 ;Originally: FRE .1
+GIVAYF      @ $E2F2 ;Originally: 
+POS         @ $E2FF ;Originally: 
+SNGFLT      @ $E301 ;Originally: 
+ERRDIR      @ $E306 ;Originally: 
+UNDFNC      @ $E30E ;Originally: 
+DEF         @ $E313 ;Originally: 
+FN_NAME     @ $E341 ;PARSE "FN" AND THE FUNCTION NAME
+;FN_NAME    @ $E341 ;Originally: FNC.
+FN_CALL     @ $E354 ;Originally: FUNCT
+FN_CALL_1   @ $E378 ;Originally: FUNCT .1
+FN_CALL_2   @ $E3A9 ;Originally: FUNCT .2
+FN_DATA     @ $E3AF ;Originally: FNCDATA
+STR         @ $E3C5 ;Originally: 
+STRINI      @ $E3D5 ;Originally: 
+STRSPA      @ $E3DD ;Originally: 
+STRLIT      @ $E3E7 ;Originally: 
+STRLT2      @ $E3ED ;Originally: 
+STRLT2_1    @ $E3F7 ;Originally: 
+STRLT2_2    @ $E404 ;Originally: 
+STRLT2_3    @ $E408 ;Originally: 
+STRLT2_4    @ $E409 ;Originally: 
+STRLT2_5    @ $E415 ;Originally: 
+STRLT2_6    @ $E41F ;Originally: 
+PUTNEW      @ $E42A ;Originally: 
+FRM2CPXERR  @ $E430 ;Throw a "?Formula Too Complex" Error
+;FRM2CPXERR @ $E430 ;Unused/Callable User-Only Entry Point
+JERR        @ $E432 ;Originally: 
+PUTEMP      @ $E435 ;Originally: 
+GETSPA      @ $E452 ;Originally: 
+GETSPA_1    @ $E454 ;Originally: 
+GETSPA_2    @ $E45F ;Originally: 
+GETSPA_3    @ $E469 ;Originally: 
+GETSPA_4    @ $E474 ;Originally: 
+GARBAGE     @ $E484 ;Collect Garbage
+FNDHISTR    @ $E488 ;Originally: FIND.HIGHEST.STRING
+FNDHISTR_1  @ $E4A0 ;Originally: FIND.HIGHEST.STRING .1
+FNDHISTR_2  @ $E4A9 ;Originally: FIND.HIGHEST.STRING .2
+FNDHISTR_3  @ $E4B5 ;Originally: FIND.HIGHEST.STRING .3
+FNDHISTR_4  @ $E4BD ;Originally: FIND.HIGHEST.STRING .4
+FNDHISTR_5  @ $E4C2 ;Originally: FIND.HIGHEST.STRING .5
+FNDHISTR_6  @ $E4CA ;Originally: FIND.HIGHEST.STRING .6
+FNDHISTR_7  @ $E4CE ;Originally: FIND.HIGHEST.STRING .7
+FNDHISTR_8  @ $E4D9 ;Originally: FIND.HIGHEST.STRING .8
+FNDHISTR_9  @ $E50A ;Originally: FIND.HIGHEST.STRING .8
+FNDHISTR_10 @ $E50C ;Originally: FIND.HIGHEST.STRING .10
+FNDHISTR_11 @ $E514 ;Originally: FIND.HIGHEST.STRING .11
+CHKSMPLVAR  @ $E519 ;Originally: CHECK_SIMPLE_VARIABLE
+CHKVAR      @ $E523 ;Originally: CHECK.VARIABLE
+CHKVAR_1    @ $E538 ;Originally: CHECK.VARIABLE .1
+CHKVAR_2    @ $E542 ;Originally: CHECK.VARIABLE .2
+CHKBUMP     @ $E552 ;Originally: CHECK.BUMP
+CHKEXIT     @ $E55D ;Originally: CHECK.EXIT
+MVHISTR2TOP @ $E562 ;Originally: MOVE.HIGHEST.STRING.TO.TOP
+CAT         @ $E597 ;Originally: 
+STR2LGERR  @ $E5B2 ;Throw a "?String Too Long" Error
+;STR2LGERR @ $E5B2 ;Unused/Callable User-Only Entry Point
+CAT_1       @ $E5B7 ;Originally: CAT .1
+MOVINS      @ $E5D4 ;Originally: 
+MOVSTR      @ $E5E2 ;Originally: 
+MOVSTR_1    @ $E5E6 ;Originally: MOVSTR.1
+MOVSTR_1_1  @ $E5EA ;Originally: MOVSTR.1 .1
+MOVSTR_1_2  @ $E5F3 ;Originally: MOVSTR.1 .2
+MOVSTR_1_3  @ $E5FC ;Originally: MOVSTR.1 .3
+FRESTR      @ $E5FD ;Originally: 
+FREFAC      @ $E600 ;Originally: 
+FRETMP      @ $E604 ;Originally: 
+FRETMP_1    @ $E62F ;Originally: FRETMP .1
+FRETMP_2    @ $E630 ;Originally: FRETMP .2
+FRETMS      @ $E635 ;Originally: 
+FRETMS_1    @ $E645 ;Originally: FRETMS .1
+CHRSTR      @ $E646 ;Originally: 
+LEFTSTR     @ $E65A ;Originally: 
+SUBSTR1     @ $E660 ;Originally: SUBSTRING.1
+SUBSTR1_1   @ $E666 ;Originally: SUBSTRING.1 .1
+SUBSTR2     @ $E667 ;Originally: SUBSTRING.2
+SUBSTR3     @ $E668 ;Originally: SUBSTRING.3
+SUBSTR3_1   @ $E67F ;Originally: SUBSTRING.3 .1
+RIGHTSTR    @ $E686 ;Originally: 
+MIDSTR      @ $E691 ;Originally: 
+MIDSTR_1    @ $E6A2 ;Originally: MIDSTR .1
+SUBSTRSU    @ $E6B9 ;Originally: SUBSTRING.SETUP
+LEN         @ $E6D6 ;Originally: 
+GETSTR      @ $E6DC ;Originally: 
+ASC         @ $E6E5 ;Originally: 
+GOIQ        @ $E6F2 ;Originally: 
+GTBYTC      @ $E6F5 ;Originally: 
+GETBYT      @ $E6F8 ;Originally: 
+CONINT      @ $E6FB ;Originally: 
+VAL         @ $E707 ;Originally: 
+VAL_1       @ $E70F ;Originally: VAL .1
+VAL_2       @ $E727 ;Originally: VAL .2
+POINT       @ $E73D ;Originally: 
+GTNUM       @ $E746 ;Originally: 
+COMBYTE     @ $E74C ;Originally: 
+GETADR      @ $E752 ;Originally: 
+PEEK        @ $E764 ;Originally: 
+POKE        @ $E77B ;Originally: 
+BAS_WAIT    @ $E784 ;Originally: 
+WAIT        @ $E784 ;Originally: 
+WAIT_1      @ $E793 ;Originally: WAIT .1
+WAIT_2      @ $E797 ;Originally: WAIT .2
+RTS_10      @ $E79F ;Originally: RTS.10
+FADDH       @ $E7A0 ;Originally: 
+FSUB        @ $E7A7 ;Originally: 
+FSUBT       @ $E7AA ;Originally: 
+FADD1       @ $E7B9 ;Originally: FADD.1
+FADD        @ $E7BE ;Originally: 
+FADDT       @ $E7C1 ;Originally: 
+FADDT1      @ $E7C6 ;Originally: FADDT .1
+FADD2       @ $E7CE ;Originally: FADD.2
+FADD2_1     @ $E7EA ;Originally: FADD.2 .1
+FADD2_2     @ $E7EE ;Originally: FADD.2 .2
+FADD3       @ $E7FA ;Originally: FADD.3
+FADD3_1     @ $E806 ;Originally: FADD.3 .1
+NRMLZFAC1   @ $E829 ;Originally: NORMALIZE.FAC.1
+NRMLZFAC2   @ $E82E ;Originally: NORMALIZE.FAC.2
+NRMLZFAC2_1 @ $E832 ;Originally: NORMALIZE.FAC.2 .1
+ZFACEXPSGN  @ $E84E ;Zero FAC Signed Exponent & Sign
+;ZFACEXPSGN @ $E84E ;Originally: ZERO.FAC
+ZFACSGNEXP  @ $E850 ;Zero FAC Signed Exponent
+;ZFACSGNEXP @ $E850 ;Originally: STA.IN.FAC.SIGN.AND.EXP
+ZFACSGN     @ $E852 ;Zero FAC Sign
+;ZFACSGN    @ $E852 ;Originally: STA.IN.FAC.SIGN
+FADD4       @ $E855 ;Originally: 
+NRMLZFAC3   @ $E874 ;Originally: NORMALIZE.FAC.3
+NRMLZFAC4   @ $E880 ;Originally: NORMALIZE.FAC.4
+NRMLZFAC5   @ $E88D ;Originally: NORMALIZE.FAC.5
+NRMLZFAC6   @ $E88F ;Originally: NORMALIZE.FAC.6
+RTS_11      @ $E89D ;Originally: RTS.11
+TWSCMPFAC   @ $E89E ;Originally: COMPLEMENT.FAC
+TCFACMANT   @ $E8A4 ;Originally: COMPLEMENT.FAC.MANTISSA
+INCFACMAN   @ $E8C6 ;Originally: INCREMENT.FAC.MANTISSA
+RTS_12      @ $E8D4 ;Originally: RTS.12
+OVERFLOW    @ $E8D5 ;Originally: 
+SHFTRGHT1   @ $E8DA ;Originally: SHIFT.RIGHT.1
+SHFTRGHT2   @ $E8DC ;Originally: SHIFT.RIGHT.2
+SHFTRGHT    @ $E8F0 ;Originally: SHIFT.RIGHT
+SHFTRGHT3   @ $E8FD ;Originally: SHIFT.RIGHT.3 or L
+SHFTRGHT3_1 @ $E903 ;Originally: SHIFT.RIGHT.3 or L .1
+SHFTRGHT4   @ $E907 ;Originally: SHIFT.RIGHT.4
+SHFTRGHT5   @ $E911 ;Originally: SHIFT.RIGHT.5
+CON_ONE     @ $E913 ;Originally: 
+POLY_LOG    @ $E918 ;Originally: 
+CON_SQRHALF @ $E92D ;Originally: CON.SQR.HALF
+CON_SQRTWO  @ $E932 ;Originally: CON.SQR.TWO
+CON_NEGHALF @ $E937 ;Originally: CON.NEG.HALF
+CON_LOGTWO  @ $E93C ;Originally: CON.LOG.TWO
+LOG         @ $E941 ;Originally: 
+GIQ         @ $E948 ;Originally: 
+LOG2        @ $E94B ;Originally: LOG.2
+FMULT       @ $E97F ;Originally: 
+FMULTT      @ $E982 ;Originally: 
+FMULTT_1    @ $E987 ;Originally: 
+MULT1       @ $E9B0 ;Originally: MULTIPLY.1
+MULT2       @ $E9B5 ;Originally: MULTIPLY.2
+MULT2_1     @ $E9B8 ;Originally: MULTIPLY.2 .1
+MULT2_2     @ $E9D4 ;Originally: MULTIPLY.2 .2
+RTS_13      @ $E9E2 ;Originally: RTS.13
+UPYA2ARG    @ $E9E3 ;UNPACK NUMBER AT (Y,A) INTO ARG (2ND FAC)
+;UPYA2ARG   @ $E9E3 ;Originally: LOAD.ARG.FROM.YA
+ADDEXPS     @ $EA0E ;Originally: ADD.EXPONENTS
+ADDEXPS1    @ $EA10 ;Originally: ADD.EXPONENTS.1
+ADDEXPS1_1  @ $EA1B ;Originally: ADD.EXPONENTS.1 .1
+ADDEXPS1_2  @ $EA26 ;Originally: ADD.EXPONENTS.1 .2
+ADDEXPS1_3  @ $EA28 ;Originally: ADD.EXPONENTS.1 .3
+OUTOFRNG    @ $EA2B ;OUT OF RANGE
+ZERO        @ $EA31 ;Originally: 
+JOV         @ $EA36 ;Originally: 
+MUL10       @ $EA39 ;Originally: 
+MUL10_1     @ $EA4F ;Originally: 
+CON_TEN     @ $EA50 ;Originally: CON.TEN
+DIV10       @ $EA55 ;Originally: 
+DIV         @ $EA5E ;Originally: 
+FDIV        @ $EA66 ;Originally: 
+FDIVT       @ $EA69 ;Originally: 
+FDIVT_1     @ $EA80 ;Originally: 
+FDIVT_2     @ $EA96 ;Originally: 
+FDIVT_3     @ $EAA3 ;Originally: 
+FDIVT_4     @ $EAA6 ;Originally: 
+FDIVT_5     @ $EAB4 ;Originally: 
+FDIVT_6     @ $EAD1 ;Originally: 
+FDIVT_7     @ $EAD5 ;Originally: 
+FDIVT_8     @ $EAE1 ;Originally: 
+CPY2FAC     @ $EAE6 ;Originally: COPY.RESULT.INTO.FAC
+LDYA2FAC    @ $EAF9 ;Originally: LOAD.FAC.FROM.YA
+FACRND2TMP2 @ $EB1E ;Originally: STORE.FAC.IN.TEMP2.ROUNDED
+FACRND2TMP1 @ $EB21 ;Originally: STORE.FAC.IN.TEMP1.ROUNDED
+SETFOR      @ $EB27 ;Originally: 
+FACRND2YX   @ $EB2B ;Originally: STORE.FAC.AT.YX.ROUNDED
+CPYARG2FAC  @ $EB53 ;Originally: COPY.ARG.TO.FAC
+MFA         @ $EB55 ;Originally: 
+MFA_1       @ $EB59 ;Originally: 
+FACRND2ARG  @ $EB63 ;Originally: COPY.FAC.TO.ARG.ROUNDED
+MAF         @ $EB66 ;Originally: 
+MAF_1       @ $EB68 ;Originally: 
+RTS_14      @ $EB71 ;Originally: RTS.14
+ROUND_FAC   @ $EB72 ;Originally: 
+INCMAN      @ $EB7A ;Originally: INCREMENT.MANTISSA
+SIGN        @ $EB82 ;Originally: 
+SIGN1       @ $EB86 ;Originally: 
+SIGN2       @ $EB88 ;Originally: 
+RTS_15      @ $EB8F ;Originally: RTS.15
+SGN         @ $EB90 ;Originally: 
+FLOAT       @ $EB93 ;Originally: 
+FLOAT_1     @ $EB9B ;Originally: 
+FLOAT_2     @ $EBA0 ;Originally: 
+ABS         @ $EBAF ;Originally: 
+FCOMP       @ $EBB2 ;Originally: 
+FCOMP2      @ $EBB4 ;Originally: 
+FCOMP2_1    @ $EBE9 ;Originally: 
+FCOMP2_2    @ $EBEF ;Originally: 
+QINT        @ $EBF2 ;Converts Real/FP to Integer Values in FAC
+;QINT       @ $EBF2 ;Originally: BAS_QINT
+PUTSTR_1    @ $EC06 ;Originally: 
+QINT1       @ $EC06 ;Originally: QINT .1
+RTS_16      @ $EC11 ;Originally: 
+QINT2       @ $EC12 ;Originally: QINT.2
+INT         @ $EC23 ;Originally: 
+QINT3       @ $EC40 ;Originally: QINT.3
+RTS_17      @ $EC49 ;Originally: RTS.17
+FIN         @ $EC4A ;Originally: 
+FIN_1       @ $EC4E ;Originally: FIN .1
+FIN_2       @ $EC5D ;Originally: FIN .2
+FIN1        @ $EC61 ;Originally: FIN.1
+FIN2        @ $EC64 ;Originally: FIN.2
+FIN3        @ $EC66 ;Originally: FIN.3
+FIN3_1      @ $EC85 ;Originally: FIN.3 .1
+FIN4        @ $EC87 ;Originally: FIN.4
+FIN5        @ $EC8A ;Originally: FIN.5
+FIN6        @ $EC8C ;Originally: FIN.6
+FIN10       @ $EC98 ;Originally: FIN.10
+FIN7        @ $EC9E ;Originally: FIN.7
+FIN8        @ $ECA0 ;Originally: FIN.8
+FIN8_13     @ $ECA9 ;Originally: FIN.8 .13
+FIN8_14     @ $ECB2 ;Originally: FIN.8 .14
+FIN8_15     @ $ECB9 ;Originally: FIN.8 .15
+FIN8_16     @ $ECBE ;Originally: FIN.8 .16
+FIN9        @ $ECC1 ;Originally: FIN.9
+FIN9_1      @ $ECC8 ;Originally: FIN.9 .1
+ADDACC      @ $ECD5 ;Originally: 
+GETEXP      @ $ECE8 ;Originally: 
+GETEXP_1    @ $ECF7 ;Originally: GETEXP .1
+GETEXP_2    @ $ED05 ;Originally: GETEXP .2
+;--------------------------------------------------------------
+;CON_10E8M1 @ $ED0A ;Originally: CON.99999999.9
+;CON_10E9M1 @ $ED0F ;Originally: CON.999999999
+;CON_10E9   @ $ED14 ;Originally: CON.BILLION
+;--------------------------------------------------------------
+CON_10E8M1  @ $ED0A ;((10^8)-1)=(   99,999,999.9)
+CON_10E9M1  @ $ED0F ;((10^9)-1)=(  999,999,999  )
+CON_10E9    @ $ED14 ; (10^9)   =(1,000,000,000  )
+;--------------------------------------------------------------
+BAS_INPRT   @ $ED19 ;Originally: INPRT
+A_INPRT     @ $ED19 ;Originally: 
+LINPRT      @ $ED24 ;Originally: 
+PRINT_FAC   @ $ED2E ;Originally: PRINT.FAC
+GO_STROUT   @ $ED31 ;Originally: GO.STROUT
+FOUT        @ $ED34 ;Originally: 
+FOUT1       @ $ED36 ;Originally: FOUT.1 
+FOUT1_1     @ $ED41 ;Originally: FOUT.1 .1
+FOUT1_2     @ $ED4F ;Originally: FOUT.1 .2
+FOUT1_3     @ $ED57 ;Originally: FOUT.1 .3
+FOUT1_4     @ $ED60 ;Originally: FOUT.1 .4
+FOUT1_5     @ $ED62 ;Originally: FOUT.1 .5
+FOUT1_6     @ $ED6D ;Originally: FOUT.1 .6
+FOUT1_7     @ $ED78 ;Originally: FOUT.1 .7
+FOUT1_8     @ $ED7F ;Originally: FOUT.1 .8
+FOUT1_9     @ $ED86 ;Originally: FOUT.1 .9
+FOUT1_10    @ $ED89 ;Originally: FOUT.1 .10
+FOUT2       @ $ED8C ;Originally: FOUT.2
+FOUT2_1     @ $ED9E ;Originally: FOUT.2 .1
+FOUT2_2     @ $ED9F ;Originally: FOUT.2 .2
+FOUT2_3     @ $EDAA ;Originally: FOUT.2 .3
+FOUT2_4     @ $EDBB ;Originally: FOUT.2 .4
+FOUT2_5     @ $EDBD ;Originally: FOUT.2 .5
+FOUT2_6     @ $EDC1 ;Originally: FOUT.2 .6
+FOUT2_7     @ $EDE5 ;Originally: FOUT.2 .7
+FOUT2_8     @ $EDE7 ;Originally: FOUT.2 .8
+FOUT2_9     @ $EDEE ;Originally: FOUT.2 .9
+FOUT2_10    @ $EE09 ;Originally: FOUT.2 .10
+FOUT3       @ $EE17 ;Originally: FOUT.3
+FOUT3_1     @ $EE19 ;Originally: FOUT.3 .1
+FOUT3_2     @ $EE26 ;Originally: FOUT.3 .2
+FOUT3_3     @ $EE36 ;Originally: FOUT.3 .3
+FOUT3_4     @ $EE42 ;Originally: FOUT.3 .4
+FOUT4       @ $EE57 ;Originally: FOUT.4
+FOUT5       @ $EE5A ;Originally: FOUT.5
+FOUT6       @ $EE5F ;Originally: FOUT.6
+CON_HALF    @ $EE64 ;Originally: CON.HALF
+DECTBL      @ $EE69 ;Originally: 
+DECTBL_END  @ $EE8D ;Originally: DECTBL.END
+SQR         @ $EE8D ;Originally: 
+FPWRT       @ $EE97 ;Originally: 
+FPWRT_1     @ $EEA0 ;Originally: 
+FPWRT_2     @ $EEBA ;Originally: 
+NEGOP       @ $EED0 ;Originally: 
+RTS_18      @ $EEDA ;Originally: RTS.18
+CON_LOG_E   @ $EEDB ;Originally: CON.LOG.E
+POLY_EXP    @ $EEE0 ;Index: (Polynomial Coeficients)-1
+;POLY_EXP   @ $EEE0 ;Originally: POLY.EXP
+EXP         @ $EF09 ;Originally: 
+EXP_1       @ $EF19 ;Originally: 
+EXP_2       @ $EF24 ;Originally: 
+EXP_3       @ $EF27 ;Originally: 
+EXP_4       @ $EF37 ;Originally: 
+POLY_ODD    @ $EF5C ;Originally: POLYNOMIAL.ODD
+POLYNOMIAL  @ $EF72 ;Originally: 
+SERMAIN     @ $EF76 ;Originally: 
+SERMAIN_1   @ $EF85 ;Originally: 
+SERMAIN_2   @ $EF89 ;Originally: 
+SERMAIN_3   @ $EF96 ;Originally: 
+RTS_19      @ $EFA5 ;Originally: RTS.19
+CON_RND1    @ $EFA6 ;Originally: CON.RND.1
+CON_RND2    @ $EFAA ;Originally: CON.RND.2
+RND         @ $EFAE ;Originally: 
+RND_1       @ $EFCC ;Originally: 
+GO_MOVMF    @ $EFE7 ;Originally: GO.MOVMF
+COS         @ $EFEA ;Originally: 
+SIN         @ $EFF1 ;Originally: 
+SIN1        @ $F023 ;Originally: 
+SIN2        @ $F026 ;Originally: SIN.2
+SIN2_1      @ $F033 ;Originally: 
+TAN         @ $F03A ;Originally: 
+TAN1        @ $F062 ;Originally: TAN.1
+CON_PI_HALF @ $F066 ;Originally: 
+CON_PI_DOUB @ $F06B ;Originally: 
+QUARTER     @ $F070 ;Originally: 
+POLY_SIN    @ $F075 ;Originally: 
+PI2_11      @ $F079 ;Originally: 
+PI2_9       @ $F07E ;Originally: 
+PI2_7       @ $F083 ;Originally: 
+PI2_5       @ $F088 ;Originally: 
+PI2_3       @ $F08D ;Originally: 
+PI2         @ $F092 ;Originally: 
+MICROSOFT_EOR87            @ $F094 ;Originally: 
+ATN         @ $F09E ;Originally: 
+ATN_1       @ $F0A6 ;Originally: 
+ATN_2       @ $F0B4 ;Originally: 
+ATN_3       @ $F0C7 ;Originally: 
+RTS_20      @ $F0CD ;Originally: 
+POLY_ATN    @ $F0CE ;Originally: 
+GENERIC_CHRGET             @ $F10B ;Originally: 
+GENERIC_CHRGET_1           @ $F111 ;Originally: 
+GENERIC_CHRGET_2           @ $F122 ;Originally: 
+GENERIC_END @ $F128 ;Originally: GENERIC.END
+COLD_START  @ $F128 ;Originally: COLD.START
+COLD_START_1   @ $F152 ;Originally: COLD.START .1
+COLD_START_2   @ $F181 ;Originally: COLD.START .2
+COLD_START_3   @ $F195 ;Originally: COLD.START .3
+COLD_START_4   @ $F1B8 ;Originally: COLD.START .4
+CALL        @ $F1D5 ;Originally: 
+IN_NUMBER   @ $F1DE ;Originally: 
+PR_NUMBER   @ $F1E5 ;Originally: 
+PLOTFNS     @ $F1EC ;Originally: 
+BAS_GOERR   @ $F206 ;Originally: 
+A_GOERR     @ $F206 ;Originally: 
+LINCOOR     @ $F209 ;Line Coordinator 
+LINCOOR_1   @ $F218 ;Originally: LINCOOR .1
+BAS_PLOT    @ $F225 ;Originally: PLOT
+A_PLOT      @ $F225 ;Originally: PLOT
+;PLOT       @ $F225 ;Originally: PLOT
+HLIN        @ $F232 ;Originally: 
+VLIN        @ $F241 ;Originally: 
+A_COLOR     @ $F24F ;Originally: 
+BAS_COLOR   @ $F24F ;Originally: 
+A_VTAB      @ $F256 ;Originally: 
+BAS_VTAB    @ $F256 ;Originally: 
+SPEED       @ $F262 ;Originally: 
+A_TRACE     @ $F26D ;Originally: 
+BAS_TRACE   @ $F26D ;Originally: 
+NOTRACE     @ $F26F ;Originally: 
+NORMAL      @ $F273 ;Originally: 
+INVERSE     @ $F277 ;Originally: 
+NRMINV      @ $F279 ;Originally: N.I.
+NRMINVFLSH  @ $F27B ;Originally: N.I.F.
+FLASH       @ $F280 ;Originally: 
+HIMEM       @ $F286 ;Originally: 
+JMM         @ $F296 ;
+SETHI       @ $F299 ;Originally: 
+LOMEM       @ $F2A6 ;Originally: 
+ONERR       @ $F2CB ;Originally: 
+HANDLERR    @ $F2E9 ;Originally: 
+RESUME      @ $F318 ;Originally: 
+JSYN        @ $F32E ;Originally: 
+DEL         @ $F331 ;Originally: 
+DEL_1       @ $F357 ;Originally: 
+DEL_2       @ $F365 ;Originally: 
+DEL_3       @ $F367 ;Originally: 
+DEL_4       @ $F371 ;Originally: 
+DEL_5       @ $F377 ;Originally: 
+DEL_6       @ $F388 ;Originally: 
+GR          @ $F390 ;Originally: 
+TEXT        @ $F399 ;Originally: 
+STORE       @ $F39F ;Originally: 
+STORE_1     @ $F3AF ;Originally: 
+RECALL      @ $F3BC ;Originally: 
+RECALL_1    @ $F3D2 ;Originally: 
+HGR2        @ $F3D8 ;Originally: 
+HGR         @ $F3E2 ;Originally: 
+SETHPG      @ $F3EA ;Originally: 
+HCLR        @ $F3F2 ;Originally: 
+BKGND       @ $F3F6 ;Originally: 
+BKGND_1     @ $F3FE ;Originally: 
+HPOSN       @ $F411 ;Originally: 
+HPOSN_1     @ $F441 ;Originally: 
+HPOSN_2     @ $F442 ;Originally: 
+HPLOT0      @ $F457 ;
+MVLFTRGT    @ $F465 ;Originally: MOVE.LEFT.OR.RIGHT
+MVLFTRGT1   @ $F46E ;Originally: LR.1
+MVLFTRGT2   @ $F471 ;Originally: LR.2
+MVLFTRGT3   @ $F476 ;Originally: LR.3
+MVLFTRGT4   @ $F478 ;Originally: LR.4
+COLORSHIFT  @ $F47E ;Originally: COLOR.SHIFT
+RTS_24      @ $F489 ;Originally: COLOR.SHIFT .1
+MVRIGHT     @ $F48A ;Originally: MOVE.RIGHT
+LRUDX1      @ $F49C ;Originally: 
+LRUDX2      @ $F49D ;Originally: 
+LRUD1       @ $F4B3 ;Originally: 
+LRUD2       @ $F4B4 ;Originally: 
+LRUD3       @ $F4C4 ;Originally: 
+LRUD4       @ $F4C8 ;Originally: 
+;EQ3        @ $F4CC ;(*+1)=$03; A Constant [Alternately]
+;CON.03     @ $F4CD ;Originally: EQU *-1 ;(( A CONSTANT ))
+EQ3         @ $F4CE ;(*-1)=$03; A Constant [Alternately]
+MVUPDWN     @ $F4D3 ;Originally: MOVE.UP.OR.DOWN
+MVUPDWN_1   @ $F4EB ;Originally: MOVE.UP.OR.DOWN
+MVUPDWN_2   @ $F4F6 ;Originally: MOVE.UP.OR.DOWN
+MVUPDWN_3   @ $F4FB ;Originally: MOVE.UP.OR.DOWN
+MVUPDWN_4   @ $F4FD ;Originally: MOVE.UP.OR.DOWN
+MVUPDWN_5   @ $F4FF ;Originally: MOVE.UP.OR.DOWN
+UD_1        @ $F501 ;Originally: 
+MVDWN       @ $F505 ;Originally: MOVE.DOWN
+CON_04      @ $F508 ;Originally: 
+CON_04_1    @ $F524 ;Originally: 
+CON_04_2    @ $F52A ;Originally: 
+CON_04_3    @ $F52C ;Originally: 
+HLINRL      @ $F530 ;Originally: 
+HGLIN       @ $F53A ;Originally: 
+HGLIN_1     @ $F550 ;Originally: 
+HGLIN_2     @ $F568 ;Originally: 
+MOVEX       @ $F57C ;Originally: 
+MOVEX2      @ $F581 ;Originally: 
+MOVEX2_1    @ $F58B ;Originally: 
+MOVEX2_2    @ $F59E ;Originally: 
+MSKTBL      @ $F5B2 ;Originally: 
+EQ1C        @ $F5B9 ;(( A CONSTANT ))
+;CON_1C     @ $F5B9 ;Originally: CON.1C
+COSTBL      @ $F5BA ;Originally: COSINE.TABLE
+HFIND       @ $F5CB ;Originally: 
+HFIND_1     @ $F5F0 ;Originally: 
+HFIND_2     @ $F5FE ;Originally: 
+RTS_22      @ $F600 ;Originally: RTS.22
+DRAW0       @ $F601 ;Originally: 
+DRAW1       @ $F605 ;Originally: 
+DRAW1_1     @ $F626 ;Originally: 
+DRAW1_2     @ $F630 ;Originally: 
+DRAW1_3     @ $F63D ;Originally: 
+DRAW1_4     @ $F648 ;Originally: 
+DRAW1_5     @ $F658 ;Originally: 
+XDRAW0      @ $F65D ;Originally: 
+XDRAW1      @ $F661 ;Originally: 
+XDRAW1_1    @ $F682 ;Originally: 
+XDRAW1_2    @ $F68C ;Originally: 
+XDRAW1_3    @ $F699 ;Originally: 
+XDRAW1_4    @ $F6A4 ;Originally: 
+XDRAW1_5    @ $F6B4 ;Originally: 
+HFNS        @ $F6B9 ;Originally: 
+HFNS_1      @ $F6CD ;Originally: 
+GGERR       @ $F6E6 ;Originally: 
+HCOLOR      @ $F6E9 ;Originally: 
+RTS_23      @ $F6F5 ;Originally: 
+COLORTBL    @ $F6F6 ;Originally: 
+HPLOT       @ $F6FE ;Originally: 
+HPLOT_1     @ $F708 ;Originally: 
+HPLOT_2     @ $F70F ;Originally: 
+ROT         @ $F721 ;Originally: 
+SCALE       @ $F727 ;Originally: 
+DRWPTR      @ $F72D ;Originally: DRWPNT
+DRWPTR_1    @ $F741 ;Originally: DRWPNT .1
+DRWPTR_2    @ $F747 ;Originally: DRWPNT .2
+DRWPTR_3    @ $F766 ;Originally: DRWPNT .3
+DRAW        @ $F769 ;Originally: 
+XDRAW       @ $F76F ;Originally: 
+SHLOAD      @ $F775 ;Originally: 
+SHLOAD_1    @ $F796 ;Originally: 
+SHLOAD_2    @ $F7A0 ;Originally: 
+SHLOAD_3    @ $F7A3 ;Originally: 
+TAPEPTR     @ $F7BC ;Originally: TAPEPNT
+GETARYPTR   @ $F7D9 ;Originally: GETARYPT
+HTAB        @ $F7E7 ;Originally: 
+HTAB_1      @ $F7EC ;Originally: HTAB .1
+HTAB_2      @ $F7FA ;Originally: HTAB .2
+KRW         @ $F7FD ;KRW = Someone's initials?
+
+;==============================================================
+
+
+;==============================================================
+; Pages 248-255 ($F8-$FF) Equates
+;--------------------------------------------------------------
+; ROM Socket F8 [(63488~65535)=($F800~$FFFF)]
+;==============================================================
+; Some labels "*" renamed from "MON_*" renamed from "MON.*"!
+;==============================================================
+; Apple II Plus Autostart [New Monitor] ROM (Starts Here)
+MONITOR     @ $F800 ;New Monitor Rom Start Address (Label)
+;MONITOR    @ $F800 ;AKA: PLOT or BAS_PLOT & MON or MON_PLOT
+;--------------------------------------------------------------
+; Apple II System Monitor [Old Monitor] ROM (Started Here Too)
+ORIGIN      @ $F800 ;Old Monitor Rom Start Address (Label)
+;==============================================================
+; Apple II Monitor II by Steve Wozniak; Modified by John A;
+; Copyright 1978 by Apple Computer, Inc.  All Rights Reserved.
+;==============================================================
+; See above: Zero Page Equates
+;--------------------------------------------------------------
+PLOT        @ $F800 ;Lo-Res Point at (X,Y)=(Y-Reg,A-Reg)
+PLOT1       @ $F80E ;Lo-Res Point at (X,Y)=(Y-Reg,MASK+GBASL/H)
+;PLOT1      @ $F80E ;Apple IIc ROMs only
+HLINE       @ $F819 ;Lo-Res H.Line at (X,Y)=(Y-Reg~H2,A-Reg)
+VLINE       @ $F828 ;Lo-Res V.Line at (X,Y)=(Y-Reg,A-Reg~V2)
+CLRSCR      @ $F832 ;Clear Lo-Res Screen to Black
+CLRTOP      @ $F836 ;Clear Top Part of Lo-Res Screen to Black
+GBASCALC    @ $F847 ;Compute GR Base Address for Line in A-Reg
+;GBASCALC   @ $F847 ;Apple IIc ROMs only
+;--------------------------------------------------------------
+; NXTCOL: This label is not here in the 1978 Apple II Plus
+; Autostart Monitor Listing; it has been repurposed & used
+; elsewhere (at $F8F5) in that listing; but the NXTCOL-SETCOL
+; code block still remains here & works the same as it always
+; did; NXTCOL has been reinstated here in the 1981 (Apple IIe)
+; listing; in that listing & here, the label at $F8F5 is PRMN1;
+; neither NXTCOL, nor SETCOL, are used by, nor referenced in,
+; the Old or New Monitors; they are surplus code for future use
+; (to increment & set colors).
+;--------------------------------------------------------------
+NXTCOL      @ $F85F ;Change Lo-Res COLOR to (COLOR)+3
+SETCOL      @ $F864 ;Set Lo-Res COLOR to A-Reg
+;==============================================================
+; Miniassembler/Disassembler Instruction Display Subroutines
+;==============================================================
+; For an explanation about how this works (sort of), see:
+; A 6502 Disassembler from Apple, Dr. Dobbs Journal, 09/76;
+; <ftp://public.asimov.net/pub/apple_ii/documentation/-
+; programming/6502assembly/6502%20disassembler%20-%201976.pdf>
+;--------------------------------------------------------------
+MON_SCRN    @ $F871 ;Get Lo-Res COLOR at (X,Y)=(X-Reg,A-Reg)
+SCRN2       @ $F879 ;(A-Reg)=(Even/Odd)=(L/H-NB)=(RTMSKZ/SCRN3)
+SCRN3       @ $F87B ;Shift A-Reg high nibble to low nibble
+RTMSKZ      @ $F87F ;Set (A-Reg)=(A-Reg AND #$0F)
+;==============================================================
+; NEEDS WORK:
+;--------------------------------------------------------------
+INSDS1      @ $F88C ;Originally: 
+INSDS2      @ $F88E ;Originally: 
+GET816LEN   @ $F890 ;Originally: 
+
+INSTDSP     @ $F8D0 ;Monitor/Mini-Assembler Display
+PRNTYX      @ $F940 ;Print Y-Reg/X-Reg as 4 Hex Digits
+PRNTAX      @ $F941 ;Print A-Reg/X-Reg as 4 Hex Digits
+PRNTX       @ $F944 ;Print X-Reg as 2 Hex Digits
+PRBLNK      @ $F948 ;Print 3 Spaces
+PRBL2       @ $F94A ;Originally: 
+PCADJ       @ $F953 ;Monitor/Mini-Assembler PC Adjust
+TEXT2COPY   @ $F962 ;Originally: 
+;LFA1E_???  @ $FA1E ;Originally: 
+OLDIRQ      @ $FA40 ;Autostart ROM IRQ Handler
+XLTBASE     @ $FA48 ;XLTBL Base Address [XLTBL-("I"=$C9=201)]
+BREAK       @ $FA4C ;Originally: 
+OLDBRK      @ $FA59 ;Originally: 
+RESET       @ $FA62 ;Originally: 
+PWRUP       @ $FAA6 ;Originally: 
+SLOOP       @ $FABA ;Originally: 
+REGDSP      @ $FAD7 ;Display register contents
+RTBL        @ $FB19 ;Originally: 
+PREAD       @ $FB1E ;Read Paddle (X-Reg), return in (Y-Reg)
+PREAD4      @ $FB21 ;Originally: 
+INIT        @ $FB2F ;Screen Initialization
+SETTXT      @ $FB39 ;Set Screen to Text Mode
+SETGR       @ $FB40 ;Set Screen to Graphics Mode
+SETWND      @ $FB4B ;Set Normal Low-Res Graphics Window
+;SETWND     @ $FB4B ;Apple IIc ROMs only
+SETWND2     @ $FB51 ;Originally: 
+TABV        @ $FB5B ;Place Cursor at Line (A-Reg) & Column (CH)
+APPLEII     @ $FB60 ;Clear screen & put "Apple II" in 1st line
+SETPWRC     @ $FB6F ;Originally: 
+VIDWAIT     @ $FB78 ;Originally: 
+KBDWAIT     @ $FB88 ;Originally: 
+VERSION     @ $FBB3 ;Originally: 
+ZIDBYTE2    @ $FBBF ;Originally: 
+ZIDBYTE     @ $FBC0 ;Originally: 
+BASCALC     @ $FBC1 ;Calculate Text Base Address
+BELL1       @ $FBD9 ;Sound Bell
+BELLA       @ $FBDD ;Sound Bell regardless of Output Device
+;BELLA      @ $FBDD ;Originally: BELL1 .1
+BELLB       @ $FBE2 ;Sound Bell without first WAIT
+;BELLB      @ $FBE2 ;Originally: BELL1 .2
+BELL2       @ $FBE4 ;Sound Bell
+STORADV     @ $FBF0 ;Originally: 
+ADVANCE     @ $FBF4 ;Move Cursor Right
+VIDOUT      @ $FBFD ;Output A-Reg As Text
+BACKSPACE   @ $FC10 ;Move Cursor Left
+UP          @ $FC1A ;Move Cursor Up
+MON_VTAB    @ $FC22 ;TAB to ROW specified in A-Reg
+VTABZ       @ $FC24 ;Originally: 
+CLREOP      @ $FC42 ;Clear Screen from cursor to end of page
+MON_HOME    @ $FC58 ;Clear Screen & Reset Text Out to Top-Left
+CR          @ $FC62 ;Perform a Carriage Return
+LF          @ $FC66 ;Perform a Line Feed
+SCROLL      @ $FC70 ;Scroll Up 1 Line
+CLREOL      @ $FC9C ;Clear To End of Line
+CLREOLZ     @ $FC9E ;Originally: 
+MON_WAIT    @ $FCA8 ;Delay (26+27*Acc+5*(Acc*Acc))/2 Cycles
+NXTA4       @ $FCB4 ;Increment A4
+NXTA1       @ $FCBA ;Increment A1
+HEADR       @ $FCC9 ;Write Cassette Sync
+WRTAPE      @ $FCE5 ;Casssette WRITE
+RD2BIT      @ $FCFA ;Cassette READ
+RDKEY       @ $FD0C ;Put Next Character Input into A-Reg (Y=CH)
+;RDKEY      @ $FD0C ;Flashes Screen Cursor Character, first.
+RDKEY0      @ $FD10 ;Originally: 
+RDKEY1      @ $FD18 ;Originally: 
+KEYIN       @ $FD1B ;Get next Key input from Keyboard hardware
+RDCHAR      @ $FD35 ;Calls RDKEY to get next CHAR
+GETLNZ      @ $FD67 ;Get a Line of Input
+GETLN       @ $FD6A ;Get a Line of Input
+GETLN0      @ $FD6C ;Originally: 
+GETLN1      @ $FD6F ;Originally: 
+CROUT1      @ $FD8B ;Originally: 
+CROUT       @ $FD8E ;Print a Carriage Return
+PRA1        @ $FD92 ;Print CR, Hex of A1H/A1L, then Minus Sign
+PRBYTE      @ $FDDA ;Print A-Reg as Two-Digit Hex Number
+PRHEX       @ $FDE3 ;Print Right Nibble of A-Reg as Single Hex Digit
+COUT        @ $FDED ;Print A-Reg to Output Device
+COUT1       @ $FDF0 ;Originally: 
+COUTZ       @ $FDF6 ;Originally: 
+IDROUTINE   @ $FE1F ;Originally: 
+MOVE        @ $FE2C ;Memory Move A1/A2 to A4
+MON_LIST    @ $FE5E ;Disassemble 20 instructions (not on GS)
+SETINV      @ $FE80 ;Set Video Mode to Inverse
+SETNORM     @ $FE84 ;Set Video Mode to Normal
+SETKBD      @ $FE89 ;Reset CHAR Input Handler to ROM
+INPORT      @ $FE8B ;Originally: 
+SETVID      @ $FE93 ;Reset CHAR Output Handler to ROM
+MON_INPRT   @ $FE8D ;Originally: 
+OUTPORT     @ $FE95 ;Originally: 
+GO          @ $FEB6 ;Originally: 
+MON_TRACE   @ $FEC2 ;Originally: 
+MON_USR     @ $FECA ;Originally: 
+MON_WRITE   @ $FECD ;Write Data to Cassette
+MON_READ    @ $FEFD ;Read Data from Cassette
+MON_READ2   @ $FF02 ;Read Data from Cassette
+PRERR       @ $FF2D ;Print "ERR" & Sound Bell
+BELL        @ $FF3A ;Sound Bell
+MON_RESTORE @ $FF3F ;Restore 6502 Registers from $45-48
+MON_SAVE    @ $FF4A ;Save 6502 Registers to $45-49
+IORTS       @ $FF58 ;JSR here to find out where one is
+OLDRST      @ $FF59 ;Reset Entry Point
+MON         @ $FF65 ;Normal Entry to Monitor
+MONZ        @ $FF69 ;Reset & Enter Monitor
+MONZ2       @ $FF6C ;Originally: 
+MONZ4       @ $FF70 ;Originally: 
+DIG         @ $FF8A ;Originally: 
+GETNUM      @ $FFA7 ;Originally: 
+NXTCHR      @ $FFAD ;Part of GETLN input loop
+TOSUB       @ $FFBE ;Originally: 
+ZMODE       @ $FFC7 ;Originally: 
+;==============================================================
+
